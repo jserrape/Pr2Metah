@@ -19,7 +19,7 @@ public class Pr2Metah {
 
     static int cubre[];
     static int matriz[][];
-    static int x, y;
+    static int y, x;
 
     public static final int SEMILLA1 = 77383426;
     public static final int SEMILLA2 = 77368737;
@@ -48,23 +48,23 @@ public class Pr2Metah {
             String[] datos;
             texto = br.readLine();
             datos = texto.split(" ");
-            y = Integer.parseInt(datos[1]) + 1;
-            x = Integer.parseInt(datos[2]) + 1;
+            x = Integer.parseInt(datos[1]) + 1;
+            y = Integer.parseInt(datos[2]) + 1;
 
-            matriz = new int[y][x];
-            cubre = new int[x];
+            matriz = new int[x][y];
+            cubre = new int[y];
 
-            for (int i = 0; i < x; i++) {
+            for (int i = 0; i < y; i++) {
                 cubre[i] = 0;
             }
-            for (int i = 1; i < y; i++) {
-                for (int j = 0; j < x; j++) {
+            for (int i = 1; i < x; i++) {
+                for (int j = 0; j < y; j++) {
                     matriz[i][j] = 0;
                 }
             }
             matriz[0][0] = 0;
             int comisariasV = 1;
-            while (x != comisariasV) {
+            while (y != comisariasV) {
                 texto = br.readLine();
                 datos = texto.split(" ");
                 for (int i = 1; i < datos.length; i++) {
@@ -73,7 +73,7 @@ public class Pr2Metah {
                 }
             }
             int cont;
-            for (int i = 1; i < y; i++) {
+            for (int i = 1; i < x; i++) {
                 texto = br.readLine();
                 datos = texto.split(" ");
                 cont = Integer.parseInt(datos[1]);
@@ -98,6 +98,12 @@ public class Pr2Metah {
         }
     }
 
+    
+    public static boolean esSolucion(int solucion[]){
+        
+        return true;
+    }
+    
     /**
      * @param args the command line arguments
      * @throws pr2metah.FicheroNoEncontrado
@@ -110,6 +116,7 @@ public class Pr2Metah {
         int n = 5;
         
         leerFichero(ficheros[0]);
+        
 
     }
 
