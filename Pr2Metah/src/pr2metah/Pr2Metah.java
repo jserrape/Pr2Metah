@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -26,9 +28,10 @@ public class Pr2Metah {
     public static final int SEMILLA3 = 34267738;
     public static final int SEMILLA4 = 87377736;
     public static final int SEMILLA5 = 12482498;
-    
+
     /**
      * Funcion para leer n fichero
+     *
      * @param fich Ruta del fichero a leer
      * @throws FicheroNoEncontrado Excepcion en caso de no encontrar el fichero
      * @throws java.io.FileNotFoundException
@@ -98,26 +101,75 @@ public class Pr2Metah {
         }
     }
 
-    
-    public static boolean esSolucion(int solucion[]){
-        
+    public static boolean esSolucion(int solucion[]) {
+        boolean ok;
+        for (int i = 1; i < x; i++) {
+            ok = false;
+            for (int j = 1; j < y; j++) {
+                if (solucion[j] == 1) {
+                    if (matriz[i][j] == 1) {
+                        j = y;
+                        ok = true;
+                    }
+                }
+            }
+            if (!ok) {
+                //System.out.println("-----------------------> NO ES SOLUCION <-------------------");
+                return false;
+            }
+        }
+        //System.out.println("SI ES SOLUCION");
         return true;
     }
-    
+
+    public static void mostrarCromosoma(int cromo[]) {
+        System.out.print("\n");
+        for (int i = 1; i < y; i++) {
+            System.out.print(cromo[i] + " ");
+        }
+        System.out.print("\n");
+    }
+
+    public static int[] generarCromosoma() {
+        int cromo[] = new int[y];
+        Random rnd = new Random();
+        int nR, n;
+        for (int i = 1; i < y; i++) {
+            cromo[i] = 0;
+        }
+        ArrayList<Integer> array = new ArrayList<>();
+        for (int i = 1; i < y; i++) {
+            array.add(i);
+        }
+
+        while (!esSolucion(cromo)) {
+            nR = (int) (rnd.nextDouble() * array.size());
+            n = array.remove(nR);
+            ++cromo[n];
+        }
+        return cromo;
+    }
+
+    public static void mostrarMatriz() {
+        for (int i = 1; i < x; i++) {
+            for (int j = 1; j < y; j++) {
+                System.out.print(matriz[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
     /**
      * @param args the command line arguments
      * @throws pr2metah.FicheroNoEncontrado
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void main(String[] args)throws FicheroNoEncontrado, InterruptedException, IOException {
-       
+    public static void main(String[] args) throws FicheroNoEncontrado, InterruptedException, IOException {
         String ficheros[] = {"scpe1.txt", "scp41.txt", "scpd1.txt", "scpnrf1.txt", "scpa1.txt"};
         int n = 5;
-        
         leerFichero(ficheros[0]);
-        
-
+        generarCromosoma();
     }
 
 }
