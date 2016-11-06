@@ -19,15 +19,10 @@ import java.util.Random;
  */
 public class Pr2Metah {
 
+    static Pair cubreOrdenado[];
     static int cubre[];
     static int matriz[][];
     static int y, x;
-
-    public static final int SEMILLA1 = 77383426;
-    public static final int SEMILLA2 = 77368737;
-    public static final int SEMILLA3 = 34267738;
-    public static final int SEMILLA4 = 87377736;
-    public static final int SEMILLA5 = 12482498;
 
     /**
      * Funcion para leer n fichero
@@ -118,7 +113,7 @@ public class Pr2Metah {
                 return false;
             }
         }
-        //System.out.println("SI ES SOLUCION");
+        System.out.println("SI ES SOLUCION");
         return true;
     }
 
@@ -141,12 +136,13 @@ public class Pr2Metah {
         for (int i = 1; i < y; i++) {
             array.add(i);
         }
-
         while (!esSolucion(cromo)) {
             nR = (int) (rnd.nextDouble() * array.size());
             n = array.remove(nR);
             ++cromo[n];
         }
+        eliminaRedundancias(y, x, cromo);
+        esSolucion(cromo);
         return cromo;
     }
 
@@ -160,6 +156,80 @@ public class Pr2Metah {
     }
 
     /**
+     * Funcion para eliminar redundancias en una solucion
+     *
+     * @param x Numero de comisarias +1
+     * @param y Numero de territorios +1
+     * @param solucion Array solucion
+     */
+    public static void eliminaRedundancias(int x, int y, int solucion[]) {
+        int quito;
+        int i;
+        boolean columnaRedundante, sustituible;
+        for (int z = 0; z < x - 1; z++) {
+            if (solucion[cubreOrdenado[z].getLugar()] == 1) {
+                columnaRedundante = true;
+                quito = cubreOrdenado[z].getLugar();
+                sustituible = false;
+                for (i = 1; i < y; i++) {
+                    if (matriz[i][quito] == 1) {
+                        sustituible = false;
+                        for (int j = 1; j < x; j++) {
+                            if (matriz[i][j] == 1 && solucion[j] == 1 && quito != j) {
+                                sustituible = true;
+                            }
+                        }
+                        if (!sustituible) {
+                            columnaRedundante = false;
+                        }
+                    }
+                }
+                if (columnaRedundante) {
+                    //System.out.println("REDUNDANTEE");
+                    solucion[quito] = 0;
+                }
+            }
+        }
+    }
+
+    /**
+     * Calcula el coste de un vector solucion
+     *
+     * @param y Numero de comisarias +1
+     * @param solucion Array solucion
+     * @param mat Matriz con la informacion del problema
+     * @return Coste de la solucion
+     */
+    public static int calculaSolucion(int y, int solucion[], int mat[][]) {
+        int coste = 0;
+        for (int i = 1; i < y; i++) {
+            if (solucion[i] == 1) {
+                coste += mat[0][i];
+            }
+        }
+        return coste;
+    }
+
+    public static int torneoBinario(int y, int cromosoma1[], int cromosoma2[], int mat[][]) {
+        int coste1 = calculaSolucion(y, cromosoma1, mat);
+        int coste2 = calculaSolucion(y, cromosoma2, mat);
+        if (coste1 > coste2) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    public static void inicializo() {
+        cubreOrdenado = new Pair[y - 1];
+        for (int i = 0; i < y - 1; i++) {
+            cubreOrdenado[i] = new Pair(i + 1, cubre[i + 1]);
+        }
+        MyQuickSort sorter = new MyQuickSort();
+        sorter.sort(cubreOrdenado);
+    }
+
+    /**
      * @param args the command line arguments
      * @throws pr2metah.FicheroNoEncontrado
      * @throws java.lang.InterruptedException
@@ -168,8 +238,11 @@ public class Pr2Metah {
     public static void main(String[] args) throws FicheroNoEncontrado, InterruptedException, IOException {
         String ficheros[] = {"scpe1.txt", "scp41.txt", "scpd1.txt", "scpnrf1.txt", "scpa1.txt"};
         int n = 5;
-        leerFichero(ficheros[0]);
-        generarCromosoma();
+        for (int j = 0; j < n; j++) {
+            leerFichero(ficheros[j]);
+            inicializo();
+            generarCromosoma();
+        }
     }
 
 }
