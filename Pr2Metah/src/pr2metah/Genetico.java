@@ -44,11 +44,11 @@ public class Genetico {
         for (int i = 1; i < y; i++) {
             array.add(i);
         }
-        while (!esSolucion(x, y, matriz, cromo)) {
-            nR = (int) (rnd.nextDouble() * array.size());
+        do {
+            nR = Math.abs(rnd.nextInt() % array.size());
             n = array.remove(nR);
             ++cromo[n];
-        }
+        } while (!esSolucion(x, y, matriz, cromo));
         eliminaRedundancias(y, x, cromo, cubreOrdenado, matriz);
         esSolucion(x, y, matriz, cromo); //SOBRA
         return cromo;
@@ -59,14 +59,8 @@ public class Genetico {
     public int torneoBinario(int y, int cromosoma1[], int cromosoma2[], int mat[][]) {
         int coste1 = calculaSolucion(y, cromosoma1, mat);
         int coste2 = calculaSolucion(y, cromosoma2, mat);
-        if (coste1 > coste2) {
-            return 1;
-        } else {
-            return 2;
-        }
+        return (coste1 > coste2) ? (1) : (2);
     }
-
-    
     
     public boolean esSolucion(int x, int y, int matriz[][], int solucion[]) {
         boolean ok;
