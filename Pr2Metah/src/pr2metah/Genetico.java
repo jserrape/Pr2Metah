@@ -25,6 +25,8 @@ public class Genetico {
         
         System.out.println("\nEl padre 1 es el "+padre1);
         System.out.println("El padre 2 es el "+padre2);
+        
+        operadorFusion(y,poblacion.get(padre1),poblacion.get(padre2),matriz);
     }
 
     public ArrayList<int[]> generarPoblacion(int x, int y, int nPoblacion, Pair cubreOrdenado[], int matriz[][]) {
@@ -57,7 +59,7 @@ public class Genetico {
         return cromo;
     }
 
-    //EL TORNEO BINARIO ME DEBE DAR SOLO 1 PADRE
+    
     public int torneoBinario(int y,ArrayList<int[]> poblacion,int mat[][]) {
         Random rnd = new Random();
         int n1 = Math.abs(rnd.nextInt() % poblacion.size());
@@ -81,6 +83,23 @@ public class Genetico {
         System.out.println("n2 tiene coste "+coste2);
         return (coste1 <= coste2) ? (1) : (2);
     }
+
+    public int[] operadorFusion(int y, int padre1[], int padre2[], int mat[][]){        //SIN ACABAR <---------------------
+        int hijo[]=new int[y];
+        int costePapi1 = calculaSolucion(y, padre1, mat);
+        int costePapi2 = calculaSolucion(y, padre2, mat);
+        float prob= (float) costePapi2 / (costePapi1+costePapi2);
+        System.out.println(prob);
+        for(int i=1;i<y;i++){
+            if(padre1[i]==padre2[i]){   //Caso de ser iguales
+                hijo[i]=padre1[i];
+            }else{                      //Caso contrario
+            
+            }
+        }
+        return hijo;
+    }
+    
 
     public boolean esSolucion(int x, int y, int matriz[][], int solucion[]) {
         boolean ok;
