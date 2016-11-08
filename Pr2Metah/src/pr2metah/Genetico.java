@@ -34,7 +34,7 @@ public class Genetico {
         for (int i = 0; i < nPoblacion; i++) {
             poblacion.add(generarCromosoma(x, y, cubreOrdenado, matriz));
         }
-        System.out.println("La poblacion tiene tamaño: " + poblacion.size());
+        System.out.println("La poblacion tiene tamaño: " + poblacion.size()+"\n");
         return poblacion;
     }
 
@@ -86,17 +86,26 @@ public class Genetico {
 
     public int[] operadorFusion(int y, int padre1[], int padre2[], int mat[][]){        //SIN ACABAR <---------------------
         int hijo[]=new int[y];
+        Random rnd = new Random();
+        float aleatorio;
         int costePapi1 = calculaSolucion(y, padre1, mat);
         int costePapi2 = calculaSolucion(y, padre2, mat);
-        float prob= (float) costePapi2 / (costePapi1+costePapi2);
-        System.out.println(prob);
+        float p= (float) costePapi2 / (costePapi1+costePapi2);
+        System.out.println("p: "+p);
         for(int i=1;i<y;i++){
             if(padre1[i]==padre2[i]){   //Caso de ser iguales
                 hijo[i]=padre1[i];
             }else{                      //Caso contrario
-            
+                aleatorio= (float) (Math.abs(rnd.nextInt() % 101))/100;
+                //System.out.println("Aleatorio: "+aleatorio);
+                if(aleatorio<=p){
+                    hijo[i]=padre1[i];
+                }else{
+                    hijo[i]=padre2[i];
+                }
             }
         }
+
         return hijo;
     }
     
