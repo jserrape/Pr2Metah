@@ -14,14 +14,19 @@ import java.util.Random;
  */
 public class Genetico {
 
+    int tabu;
     
     
     public void mainGenetico(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[]) {
-        generarPoblacion(x, y, 50, cubreOrdenado, matriz);
+        ArrayList<int[]> poblacion= generarPoblacion(x, y, 50, cubreOrdenado, matriz);
+        tabu=-1;
+        int padre1=torneoBinario(y,poblacion,matriz);
+        int padre2=torneoBinario(y,poblacion,matriz);
+        
+        System.out.println("\nEl padre 1 es el "+padre1);
+        System.out.println("El padre 2 es el "+padre2);
     }
 
-    
-    
     public ArrayList<int[]> generarPoblacion(int x, int y, int nPoblacion, Pair cubreOrdenado[], int matriz[][]) {
         ArrayList<int[]> poblacion = new ArrayList<>();
         for (int i = 0; i < nPoblacion; i++) {
@@ -31,8 +36,6 @@ public class Genetico {
         return poblacion;
     }
 
-    
-    
     public int[] generarCromosoma(int x, int y, Pair cubreOrdenado[], int matriz[][]) {
         int cromo[] = new int[y];
         Random rnd = new Random();
@@ -54,14 +57,31 @@ public class Genetico {
         return cromo;
     }
 
-    
-    
-    public int torneoBinario(int y, int cromosoma1[], int cromosoma2[], int mat[][]) {
-        int coste1 = calculaSolucion(y, cromosoma1, mat);
-        int coste2 = calculaSolucion(y, cromosoma2, mat);
-        return (coste1 > coste2) ? (1) : (2);
+    //EL TORNEO BINARIO ME DEBE DAR SOLO 1 PADRE
+    public int torneoBinario(int y,ArrayList<int[]> poblacion,int mat[][]) {
+        Random rnd = new Random();
+        int n1 = Math.abs(rnd.nextInt() % poblacion.size());
+        System.out.println(n1);
+        int n2 = Math.abs(rnd.nextInt() % poblacion.size());
+        System.out.println(n2);
+        while (n1 == n2 || n1 == tabu || n2 == tabu) {
+            n1 = Math.abs(rnd.nextInt() % poblacion.size());
+            n2 = Math.abs(rnd.nextInt() % poblacion.size());
+        }
+        int n=torneoCoste(y,poblacion.get(n1),poblacion.get(n2),mat);
+        tabu=n;
+        System.out.println("Ha ganado el "+n);
+        return (n == 1) ? (n1) : (n2);
     }
-    
+
+    public int torneoCoste(int y, int cromosoma1[], int cromosoma2[], int mat[][]) {
+        int coste1 = calculaSolucion(y, cromosoma1, mat);
+        System.out.println("n1 tiene coste "+coste1);
+        int coste2 = calculaSolucion(y, cromosoma2, mat);
+        System.out.println("n2 tiene coste "+coste2);
+        return (coste1 <= coste2) ? (1) : (2);
+    }
+
     public boolean esSolucion(int x, int y, int matriz[][], int solucion[]) {
         boolean ok;
         for (int i = 1; i < x; i++) {
@@ -81,8 +101,6 @@ public class Genetico {
         return true;
     }
 
-    
-    
     public int calculaSolucion(int y, int solucion[], int mat[][]) {
         int coste = 0;
         for (int i = 1; i < y; i++) {
@@ -93,8 +111,6 @@ public class Genetico {
         return coste;
     }
 
-    
-    
     public boolean esSolucionPrint(int x, int y, int matriz[][], int solucion[]) {
         boolean ok;
         for (int i = 1; i < x; i++) {
@@ -116,8 +132,6 @@ public class Genetico {
         return true;
     }
 
-    
-    
     public void mostrarCromosoma(int y, int cromo[]) {
         for (int i = 1; i < y; i++) {
             System.out.print(cromo[i] + " ");
@@ -125,8 +139,6 @@ public class Genetico {
         System.out.print("\n");
     }
 
-    
-    
     public void eliminaRedundancias(int x, int y, int solucion[], Pair cubreOrdenado[], int matriz[][]) {
         int quito;
         int i;
@@ -156,7 +168,5 @@ public class Genetico {
             }
         }
     }
-    
-    
-    
+
 }
