@@ -128,6 +128,23 @@ public class Genetico {
         }
         return true;
     }
+    
+    public void hux(int padre[], int madre[], int hijo1[], int hijo2[], int tam) {
+        Random rand = new Random();
+        for (int i = 1; i < tam; ++i){
+            if (padre[i] != madre [i]) {
+                if(rand.nextDouble() < 0.5) {
+                    hijo1[i] = padre[i];
+                    hijo2[i] = madre[i];
+                } else {
+                    hijo1[i] = madre[i];
+                    hijo2[i] = padre[i];
+                }
+            } else {
+                hijo1[i] = hijo2[i] = padre[i];
+            }
+        }
+    }
 
     public int calculaSolucion(int y, int solucion[], int mat[][]) {
         int coste = 0;
