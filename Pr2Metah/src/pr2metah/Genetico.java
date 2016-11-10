@@ -183,6 +183,56 @@ public class Genetico {
         }
         System.out.print("\n");
     }
+    
+    public void arreglaSolucion(ArrayList<int[]> poblacion, int matriz[][], int costes[], int pos, int x, int y, Pair pair[]) {
+
+
+        //Se genera un vector con todos los candidatos que cubren alguna zona de las que me quedan por cubrir al eliminar esa ( sin incluirla )
+        int vecino[] = new int[y];
+        int zonas[] = new int[x];
+        int zonasPendientes = 0;
+        int coste = costes[pos];
+
+        for (int i = 1; i < y; i++) {
+            vecino[i] = 0;
+            if (i < x) {
+                zonas[i] = 0;
+            }
+        }
+
+        //Se rellena el vector de zonas, las posiciones que quedan con 0, son las que faltan por cubrir
+        for (int k = 1; k < y; k++) {
+            for (int j = 1; j < x; j++) {
+                if (matriz[j][k] == 1 && zonas[j] == 0 && poblacion.get(pos)[k] == 1) {
+                    zonas[j] = 1;
+                    ++zonasPendientes;
+                }
+            }
+        }
+        zonasPendientes = x - zonasPendientes - 1;
+        for (int k = 1; (k < y && zonasPendientes > 0); k++) {
+            for (int j = 1; j < x; j++) {
+                if (k != pos) {
+                    if ((matriz[j][k] == 1) && (zonas[j] == 0)) { //La zona esta sin cubrir
+                        vecino[k] = 1;
+                        zonas[j] = 1;
+                        --zonasPendientes;
+                    }
+                }
+            }
+        }
+
+        for (int i = 1; i < y; i++) {
+            if (poblacion.get(pos)[i] == 0 && vecino[i] == 1) {
+                if (i != pos) {
+                    poblacion.get(pos)[i] = 1;
+                    coste += matriz[0][i];
+                }
+            }
+        }
+        coste = eliminaRedundancias(x, y, poblacion.get(pos), pair, matriz, coste);
+        costes[pos] = coste;
+    }
 
     public void eliminaRedundancias(int x, int y, int solucion[], Pair cubreOrdenado[], int matriz[][]) {
         int quito;
@@ -212,6 +262,38 @@ public class Genetico {
                 }
             }
         }
+    }
+    
+    public int eliminaRedundancias(int x, int y, int solucion[], Pair cubreOrdenado[], int matriz[][], int coste) {
+        int factorizacion = coste;
+        int quito;
+        int i;
+        boolean columnaRedundante, sustituible;
+        for (int z = 0; z < x - 1; z++) {
+            if (solucion[cubreOrdenado[z].getLugar()] == 1) {
+                columnaRedundante = true;
+                quito = cubreOrdenado[z].getLugar();
+                sustituible = false;
+                for (i = 1; i < y; i++) {
+                    if (matriz[i][quito] == 1) {
+                        sustituible = false;
+                        for (int j = 1; j < x; j++) {
+                            if (matriz[i][j] == 1 && solucion[j] == 1 && quito != j) {
+                                sustituible = true;
+                            }
+                        }
+                        if (!sustituible) {
+                            columnaRedundante = false;
+                        }
+                    }
+                }
+                if (columnaRedundante) {
+                    solucion[quito] = 0;
+                    factorizacion = factorizacion - matriz[0][quito];
+                }
+            }
+        }
+        return factorizacion;
     }
 
 }
