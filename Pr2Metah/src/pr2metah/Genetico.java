@@ -31,7 +31,12 @@ public class Genetico {
         System.out.println("\nEl padre 1 es el " + padre1);
         System.out.println("El padre 2 es el " + padre2);
 
-        operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz,padre1,padre2);
+        int hijoFusion[] = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
+        esSolucionPrint(x,y,matriz,hijoFusion);
+        ////////////////////////////////////////////////////////////////////////////
+        poblacion.set(0, hijoFusion);
+        costes[0]=calculaSolucion(y,poblacion.get(0),matriz);
+        arreglaSolucion(matriz,0,x,y, cubreOrdenado);
     }
 
     public void generarCostes(int y, int mat[][]) {
@@ -39,7 +44,7 @@ public class Genetico {
             costes[i] = calculaSolucion(y, poblacion.get(i), mat);
         }
         for (int i = 0; i < poblacion.size(); i++) {
-            System.out.println(i+": "+costes[i]);
+            System.out.println(i + ": " + costes[i]);
         }
     }
 
@@ -192,7 +197,7 @@ public class Genetico {
         return true;
     }
 
-    public void arreglaSolucion(ArrayList<int[]> poblacion, int matriz[][], int costes[], int pos, int x, int y, Pair pair[]) {
+    public void arreglaSolucion(int matriz[][], int pos, int x, int y, Pair pair[]) {
         //Se genera un vector con todos los candidatos que cubren alguna zona de las que me quedan por cubrir al eliminar esa ( sin incluirla )
         int vecino[] = new int[y];
         int zonas[] = new int[x];
