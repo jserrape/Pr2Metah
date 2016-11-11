@@ -17,29 +17,57 @@ public class Genetico {
     int tamPoblacion = 50;
     int tabu;
     ArrayList<int[]> poblacion;
+    ArrayList<int[]> descendencia;
     int costes[];
+    int costesAux[];
 
+    //FUSION
     public void mainGenetico(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[]) {
         poblacion = new ArrayList<>();
+        descendencia = new ArrayList<>();
         costes = new int[tamPoblacion];
+        costesAux = new int[tamPoblacion];
+        int hijoFusion[],peorCoste,mejorCoste,pos = 0,pos2 = 0;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
         generarCostes(y, matriz);
-        tabu = -1;
-        int padre1 = torneoBinario(y, poblacion, matriz);
-        int padre2 = torneoBinario(y, poblacion, matriz);
+        /////////////////////////////////////////
+        //Esto me crea la primera descendencia de 50 pimpollos
+        peorCoste=0;
+        for (int i = 0; i < tamPoblacion; i++) {
+            tabu = -1;
+            int padre1 = torneoBinario(y, poblacion, matriz);
+            int padre2 = torneoBinario(y, poblacion, matriz);
+            hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
+            esSolucionPrint(x, y, matriz, hijoFusion);
+            descendencia.add(hijoFusion);
+            arreglaSolucion(matriz, i, x, y, cubreOrdenado);
+            esSolucionPrint(x, y, matriz, descendencia.get(i));
+            if(peorCoste<costesAux[i]){ //PARA GUARDAR EL ELITISMO
+                peorCoste=costesAux[i];
+                pos=i;
+                System.out.println("Actualizo el peor a coste "+peorCoste+" de la pos "+pos);
+            }
+        }
+        mejorCoste=99999999;
+        for(int i=0;i<tamPoblacion;i++){ //BUSCAR LA MEJOR DE LA POBLACION
+            if(costes[i]<mejorCoste){
+                mejorCoste=costes[i];
+                pos2=i;
+            }
+        }
+        //COPIO EL MEJOR DE LOA POBALCIUON SOBRE EL PEOR DE LOS DESCENDIENTES
+        // E PASO LOS DESCENDIENTES A POBLACION
+        if(peorCoste>mejorCoste){
+            System.out.println("Intercambio poblaciones");
+            descendencia.set(pos, poblacion.get(pos2));
+            costesAux[pos]=mejorCoste;
+        }else{
+            System.out.println("POLLAS");
+        }
+        poblacion=(ArrayList<int[]>) descendencia.clone();
+        System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
 
-        System.out.println("\nEl padre 1 es el " + padre1);
-        System.out.println("El padre 2 es el " + padre2);
 
-        int hijoFusion[] = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
-        esSolucionPrint(x,y,matriz,hijoFusion);
-        ////////////////////////////////////////////////////////////////////////////
-        poblacion.set(0, hijoFusion);
-        costes[0]=calculaSolucion(y,poblacion.get(0),matriz);
-        arreglaSolucion(matriz,0,x,y, cubreOrdenado);
-        esSolucionPrint(x,y,matriz,poblacion.get(0));
-        costes[0]=calculaSolucion(y,poblacion.get(0),matriz);
-        System.out.println("Tiene coste: "+costes[0]);
     }
 
     public void generarCostes(int y, int mat[][]) {
@@ -216,7 +244,7 @@ public class Genetico {
         //Se rellena el vector de zonas, las posiciones que quedan con 0, son las que faltan por cubrir
         for (int k = 1; k < y; k++) {
             for (int j = 1; j < x; j++) {
-                if (matriz[j][k] == 1 && zonas[j] == 0 && poblacion.get(pos)[k] == 1) {
+                if (matriz[j][k] == 1 && zonas[j] == 0 && descendencia.get(pos)[k] == 1) {
                     zonas[j] = 1;
                     ++zonasPendientes;
                 }
@@ -235,15 +263,15 @@ public class Genetico {
             }
         }
         for (int i = 1; i < y; i++) {
-            if (poblacion.get(pos)[i] == 0 && vecino[i] == 1) {
+            if (descendencia.get(pos)[i] == 0 && vecino[i] == 1) {
                 if (i != pos) {
-                    poblacion.get(pos)[i] = 1;
+                    descendencia.get(pos)[i] = 1;
                     coste += matriz[0][i];
                 }
             }
         }
-        coste = eliminaRedundancias(x, y, poblacion.get(pos), pair, matriz, coste);
-        costes[pos] = coste;
+        coste = eliminaRedundancias(x, y, descendencia.get(pos), pair, matriz, coste);
+        costesAux[pos] = coste;
     }
 
     public void eliminaRedundancias(int x, int y, int solucion[], Pair cubreOrdenado[], int matriz[][]) {
