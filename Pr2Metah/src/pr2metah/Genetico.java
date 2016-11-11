@@ -37,6 +37,9 @@ public class Genetico {
         poblacion.set(0, hijoFusion);
         costes[0]=calculaSolucion(y,poblacion.get(0),matriz);
         arreglaSolucion(matriz,0,x,y, cubreOrdenado);
+        esSolucionPrint(x,y,matriz,poblacion.get(0));
+        costes[0]=calculaSolucion(y,poblacion.get(0),matriz);
+        System.out.println("Tiene coste: "+costes[0]);
     }
 
     public void generarCostes(int y, int mat[][]) {
@@ -278,15 +281,15 @@ public class Genetico {
         int quito;
         int i;
         boolean columnaRedundante, sustituible;
-        for (int z = 0; z < x - 1; z++) {
+        for (int z = 0; z < z - 1; z++) {
             if (solucion[cubreOrdenado[z].getLugar()] == 1) {
                 columnaRedundante = true;
                 quito = cubreOrdenado[z].getLugar();
                 sustituible = false;
-                for (i = 1; i < y; i++) {
+                for (i = 1; i < x; i++) {
                     if (matriz[i][quito] == 1) {
                         sustituible = false;
-                        for (int j = 1; j < x; j++) {
+                        for (int j = 1; j < z; j++) {
                             if (matriz[i][j] == 1 && solucion[j] == 1 && quito != j) {
                                 sustituible = true;
                             }
