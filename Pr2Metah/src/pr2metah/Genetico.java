@@ -42,7 +42,7 @@ public class Genetico {
                 tabu = -1;
                 int padre1 = torneoBinario(y, poblacion, matriz);
                 int padre2 = torneoBinario(y, poblacion, matriz);
-                if (rand.nextDouble() < 0.69) {
+                if (rand.nextDouble() < 0.69) { //el 0 esta incluido
                     hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
                     esSolucionPrint(x, y, matriz, hijoFusion);
                     descendencia.add(hijoFusion);
@@ -51,8 +51,10 @@ public class Genetico {
                 } else {
                     if (costes[padre1] < costes[padre2]) {
                         descendencia.add(poblacion.get(padre1));
+                        costesAux[i] = costes[padre1];
                     } else {
                         descendencia.add(poblacion.get(padre2));
+                        costesAux[i] = costes[padre2];
                     }
                 }   
                 if (peorCoste < costesAux[i]) { //PARA GUARDAR EL ELITISMO
