@@ -33,7 +33,8 @@ public class Genetico {
         /////////////////////////////////////////
         //Esto me crea la primera descendencia de 50 pimpollos
 
-        for (int z = 0; z < 400; z++) {
+        //for (int z = 0; z < 400; z++) {
+            Random rand = new Random();
             descendencia = new ArrayList<>();
             costesAux = new int[tamPoblacion];
             peorCoste = 0;
@@ -41,11 +42,19 @@ public class Genetico {
                 tabu = -1;
                 int padre1 = torneoBinario(y, poblacion, matriz);
                 int padre2 = torneoBinario(y, poblacion, matriz);
-                hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
-                esSolucionPrint(x, y, matriz, hijoFusion);
-                descendencia.add(hijoFusion);
-                arreglaSolucion(matriz, i, x, y, cubreOrdenado);
-                esSolucionPrint(x, y, matriz, descendencia.get(i));
+                if (rand.nextDouble() < 0.69) {
+                    hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
+                    esSolucionPrint(x, y, matriz, hijoFusion);
+                    descendencia.add(hijoFusion);
+                    arreglaSolucion(matriz, i, x, y, cubreOrdenado);
+                    esSolucionPrint(x, y, matriz, descendencia.get(i));
+                } else {
+                    if (costes[padre1] < costes[padre2]) {
+                        descendencia.add(poblacion.get(padre1));
+                    } else {
+                        descendencia.add(poblacion.get(padre2));
+                    }
+                }   
                 if (peorCoste < costesAux[i]) { //PARA GUARDAR EL ELITISMO
                     peorCoste = costesAux[i];
                     pos = i;
@@ -91,7 +100,7 @@ public class Genetico {
             System.out.println("--------------------------------------");
             System.out.println("--------------------------------------");
             System.out.println("--------------------------------------");
-        }
+        //}
 
     }
 
@@ -188,7 +197,7 @@ public class Genetico {
         Random rand = new Random();
         for (int i = 1; i < tam; ++i) {
             if (padre[i] != madre[i]) {
-                if (rand.nextDouble() < 0.5) {
+                if (rand.nextDouble() < 0.49) {
                     hijo1[i] = padre[i];
                     hijo2[i] = madre[i];
                 } else {
