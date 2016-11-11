@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class Genetico {
 
-    int tamPoblacion = 10;
+    int tamPoblacion = 50;
     int tabu;
     ArrayList<int[]> poblacion;
     ArrayList<int[]> descendencia;
@@ -32,49 +32,63 @@ public class Genetico {
         generarCostes(y, matriz);
         /////////////////////////////////////////
         //Esto me crea la primera descendencia de 50 pimpollos
-        peorCoste = 0;
-        for (int i = 0; i < tamPoblacion; i++) {
-            tabu = -1;
-            int padre1 = torneoBinario(y, poblacion, matriz);
-            int padre2 = torneoBinario(y, poblacion, matriz);
-            hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
-            esSolucionPrint(x, y, matriz, hijoFusion);
-            descendencia.add(hijoFusion);
-            arreglaSolucion(matriz, i, x, y, cubreOrdenado);
-            esSolucionPrint(x, y, matriz, descendencia.get(i));
-            if (peorCoste < costesAux[i]) { //PARA GUARDAR EL ELITISMO
-                peorCoste = costesAux[i];
-                pos = i;
-                System.out.println("Actualizo el peor a coste " + peorCoste + " de la pos " + pos);
-            }
-        }
-        mejorCoste = 99999999;
-        for (int i = 0; i < tamPoblacion; i++) { //BUSCAR LA MEJOR DE LA POBLACION
-            if (costes[i] < mejorCoste) {
-                mejorCoste = costes[i];
-                pos2 = i;
-            }
-        }
-        //COPIO EL MEJOR DE LOA POBALCIUON SOBRE EL PEOR DE LOS DESCENDIENTES
-        // E PASO LOS DESCENDIENTES A POBLACION
-        System.out.println("Costes aux");
-        for (int i = 0; i < tamPoblacion; i++) {
-            System.out.println(i + ": " + costes[i]);
-        }
 
-        if (peorCoste > mejorCoste) {
-            System.out.println("Intercambio poblaciones");
-            descendencia.set(pos, poblacion.get(pos2));
-            costesAux[pos] = mejorCoste;
-        } else {
-            System.out.println("POLLAS");
-        }
-        poblacion = (ArrayList<int[]>) descendencia.clone();
-        System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
+        for (int z = 0; z < 400; z++) {
+            peorCoste = 0;
+            for (int i = 0; i < tamPoblacion; i++) {
+                tabu = -1;
+                int padre1 = torneoBinario(y, poblacion, matriz);
+                int padre2 = torneoBinario(y, poblacion, matriz);
+                hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
+                esSolucionPrint(x, y, matriz, hijoFusion);
+                descendencia.add(hijoFusion);
+                arreglaSolucion(matriz, i, x, y, cubreOrdenado);
+                esSolucionPrint(x, y, matriz, descendencia.get(i));
+                if (peorCoste < costesAux[i]) { //PARA GUARDAR EL ELITISMO
+                    peorCoste = costesAux[i];
+                    pos = i;
+                    System.out.println("Actualizo el peor a coste " + peorCoste + " de la pos " + pos);
+                }
+            }
+            mejorCoste = 99999999;
+            for (int i = 0; i < tamPoblacion; i++) { //BUSCAR LA MEJOR DE LA POBLACION
+                if (costes[i] < mejorCoste) {
+                    mejorCoste = costes[i];
+                    pos2 = i;
+                }
+            }
 
-        System.out.println("Costes finales");
-        for (int i = 0; i < tamPoblacion; i++) {
-            System.out.println(i + ": " + costes[i]);
+            for (int i = 0; i < tamPoblacion; i++) {
+                System.out.println(i + ":\tpoblacion=" + costes[i] + "\tdescendientes=" + costesAux[i]);
+            }
+
+            System.out.println("El mejor de la poblacion es el nº " + pos2 + " con coste " + mejorCoste);
+            System.out.println("El  peor  descendiente  es  el nº " + pos + " con coste " + peorCoste);
+            //COPIO EL MEJOR DE LOA POBLACION SOBRE EL PEOR DE LOS DESCENDIENTES
+
+            if (peorCoste > mejorCoste) {
+                System.out.println("Intercambio elitismo");
+                descendencia.set(pos, poblacion.get(pos2));
+                costesAux[pos] = mejorCoste;
+            } else {
+                System.out.println("POLLAS");
+            }
+
+            for (int i = 0; i < tamPoblacion; i++) {
+                System.out.println(i + ":\tpoblacion=" + costes[i] + "\tdescendientes=" + costesAux[i]);
+            }
+
+            //PASO LOS DESCENDIENTES A POBLACION
+            poblacion = (ArrayList<int[]>) descendencia.clone();
+            System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
+            System.out.println("Sustituyo a la poblacion anterior");
+
+            for (int i = 0; i < tamPoblacion; i++) {
+                System.out.println(i + ":\tpoblacion=" + costes[i] + "\tdescendientes=" + costesAux[i]);
+            }
+            System.out.println("--------------------------------------");
+            System.out.println("--------------------------------------");
+            System.out.println("--------------------------------------");
         }
 
     }
@@ -84,7 +98,7 @@ public class Genetico {
             costes[i] = calculaSolucion(y, poblacion.get(i), mat);
         }
         for (int i = 0; i < poblacion.size(); i++) {
-            System.out.println(i + ": " + costes[i]);
+            //System.out.println(i + ": " + costes[i]);
         }
     }
 
@@ -126,15 +140,20 @@ public class Genetico {
             n1 = Math.abs(rnd.nextInt() % poblacion.size());
             n2 = Math.abs(rnd.nextInt() % poblacion.size());
         }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        System.out.println(n1+"     "+n2+"  <--------------------------------------------------------------------------------------------");
+        
+         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         int n = torneoCoste(y, costes[n1], costes[n2], mat);
         tabu = n;
-        System.out.println("Ha ganado el " + n);
+        //System.out.println("Ha ganado el " + n);
         return (n == 1) ? (n1) : (n2);
     }
 
     public int torneoCoste(int y, int coste1, int coste2, int mat[][]) {
-        System.out.println("n1 tiene coste " + coste1);
-        System.out.println("n2 tiene coste " + coste2);
+        //System.out.println("n1 tiene coste " + coste1);
+        //System.out.println("n2 tiene coste " + coste2);
         return (coste1 <= coste2) ? (1) : (2);
     }
 
