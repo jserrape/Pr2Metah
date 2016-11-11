@@ -24,9 +24,9 @@ public class Genetico {
     //FUSION
     public void mainGenetico(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[]) {
         poblacion = new ArrayList<>();
-        descendencia = new ArrayList<>();
+        
         costes = new int[tamPoblacion];
-        costesAux = new int[tamPoblacion];
+        
         int hijoFusion[], peorCoste, mejorCoste, pos = 0, pos2 = 0;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
         generarCostes(y, matriz);
@@ -34,6 +34,8 @@ public class Genetico {
         //Esto me crea la primera descendencia de 50 pimpollos
 
         for (int z = 0; z < 400; z++) {
+            descendencia = new ArrayList<>();
+            costesAux = new int[tamPoblacion];
             peorCoste = 0;
             for (int i = 0; i < tamPoblacion; i++) {
                 tabu = -1;
