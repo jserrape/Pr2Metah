@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class Genetico {
 
-    int tamPoblacion = 50;
+    int tamPoblacion = 10;
     int tabu;
     ArrayList<int[]> poblacion;
     ArrayList<int[]> descendencia;
@@ -27,12 +27,12 @@ public class Genetico {
         descendencia = new ArrayList<>();
         costes = new int[tamPoblacion];
         costesAux = new int[tamPoblacion];
-        int hijoFusion[],peorCoste,mejorCoste,pos = 0,pos2 = 0;
+        int hijoFusion[], peorCoste, mejorCoste, pos = 0, pos2 = 0;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
         generarCostes(y, matriz);
         /////////////////////////////////////////
         //Esto me crea la primera descendencia de 50 pimpollos
-        peorCoste=0;
+        peorCoste = 0;
         for (int i = 0; i < tamPoblacion; i++) {
             tabu = -1;
             int padre1 = torneoBinario(y, poblacion, matriz);
@@ -42,31 +42,40 @@ public class Genetico {
             descendencia.add(hijoFusion);
             arreglaSolucion(matriz, i, x, y, cubreOrdenado);
             esSolucionPrint(x, y, matriz, descendencia.get(i));
-            if(peorCoste<costesAux[i]){ //PARA GUARDAR EL ELITISMO
-                peorCoste=costesAux[i];
-                pos=i;
-                System.out.println("Actualizo el peor a coste "+peorCoste+" de la pos "+pos);
+            if (peorCoste < costesAux[i]) { //PARA GUARDAR EL ELITISMO
+                peorCoste = costesAux[i];
+                pos = i;
+                System.out.println("Actualizo el peor a coste " + peorCoste + " de la pos " + pos);
             }
         }
-        mejorCoste=99999999;
-        for(int i=0;i<tamPoblacion;i++){ //BUSCAR LA MEJOR DE LA POBLACION
-            if(costes[i]<mejorCoste){
-                mejorCoste=costes[i];
-                pos2=i;
+        mejorCoste = 99999999;
+        for (int i = 0; i < tamPoblacion; i++) { //BUSCAR LA MEJOR DE LA POBLACION
+            if (costes[i] < mejorCoste) {
+                mejorCoste = costes[i];
+                pos2 = i;
             }
         }
         //COPIO EL MEJOR DE LOA POBALCIUON SOBRE EL PEOR DE LOS DESCENDIENTES
         // E PASO LOS DESCENDIENTES A POBLACION
-        if(peorCoste>mejorCoste){
+        System.out.println("Costes aux");
+        for (int i = 0; i < tamPoblacion; i++) {
+            System.out.println(i + ": " + costes[i]);
+        }
+
+        if (peorCoste > mejorCoste) {
             System.out.println("Intercambio poblaciones");
             descendencia.set(pos, poblacion.get(pos2));
-            costesAux[pos]=mejorCoste;
-        }else{
+            costesAux[pos] = mejorCoste;
+        } else {
             System.out.println("POLLAS");
         }
-        poblacion=(ArrayList<int[]>) descendencia.clone();
+        poblacion = (ArrayList<int[]>) descendencia.clone();
         System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
 
+        System.out.println("Costes finales");
+        for (int i = 0; i < tamPoblacion; i++) {
+            System.out.println(i + ": " + costes[i]);
+        }
 
     }
 
@@ -198,7 +207,7 @@ public class Genetico {
                 return false;
             }
         }
-        System.out.println("SI ES SOLUCION");
+        System.out.println("-----------------------> si es solucion <-------------------");
         return true;
     }
 
