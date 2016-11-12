@@ -20,16 +20,16 @@ public class Genetico {
     ArrayList<int[]> descendencia;
     int costes[];
     int costesAux[];
+    double probGen;
 
     //FUSION
     public void mainGenetico(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[]) {
         poblacion = new ArrayList<>();
-        
+        probGen = 0.2;
         costes = new int[tamPoblacion];
         
         int hijoFusion[], peorCoste, mejorCoste, pos = 0, pos2 = 0;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
-        generarCostes(y, matriz);
         /////////////////////////////////////////
         //Esto me crea la primera descendencia de 50 pimpollos
 
@@ -42,7 +42,7 @@ public class Genetico {
                 tabu = -1;
                 int padre1 = torneoBinario(y, poblacion, matriz);
                 int padre2 = torneoBinario(y, poblacion, matriz);
-                if (rand.nextDouble() < 0.69) { //el 0 esta incluido
+                if (rand.nextDouble() < 0.70) { //el 0 esta incluido
                     hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
                     esSolucionPrint(x, y, matriz, hijoFusion);
                     descendencia.add(hijoFusion);
@@ -63,6 +63,7 @@ public class Genetico {
                     System.out.println("Actualizo el peor a coste " + peorCoste + " de la pos " + pos);
                 }
             }
+            //Esto porque es?
             mejorCoste = 99999999;
             for (int i = 0; i < tamPoblacion; i++) { //BUSCAR LA MEJOR DE LA POBLACION
                 if (costes[i] < mejorCoste) {
@@ -95,6 +96,11 @@ public class Genetico {
             poblacion = (ArrayList<int[]>) descendencia.clone();
             System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
             System.out.println("Sustituyo a la poblacion anterior");
+            
+            //Aqui iria la mutacion? HAY QUE PREGUNTAR EL LUNES
+            if (rand.nextDouble() < 0.02) {
+                
+            }
 
             for (int i = 0; i < tamPoblacion; i++) {
                 System.out.println(i + ":\tpoblacion=" + costes[i] + "\tdescendientes=" + costesAux[i]);
@@ -106,24 +112,16 @@ public class Genetico {
 
     }
 
-    public void generarCostes(int y, int mat[][]) {
-        for (int i = 0; i < poblacion.size(); i++) {
-            costes[i] = calculaSolucion(y, poblacion.get(i), mat);
-        }
-        for (int i = 0; i < poblacion.size(); i++) {
-            //System.out.println(i + ": " + costes[i]);
-        }
-    }
-
     public void generarPoblacion(int x, int y, int nPoblacion, Pair cubreOrdenado[], int matriz[][]) {
-        for (int i = 0; i < nPoblacion; i++) {
-            poblacion.add(generarCromosoma(x, y, cubreOrdenado, matriz));
+        for (int i = 0; i < nPoblacion; ++i) {
+            poblacion.add(generarCromosoma(x, y, cubreOrdenado, matriz, i));
         }
         System.out.println("La poblacion tiene tamaño: " + poblacion.size() + "\n");
     }
 
-    public int[] generarCromosoma(int x, int y, Pair cubreOrdenado[], int matriz[][]) {
+    public int[] generarCromosoma(int x, int y, Pair cubreOrdenado[], int matriz[][], int num) {
         int cromo[] = new int[y];
+        int coste = 0;
         Random rnd = new Random();
         int nR, n;
         for (int i = 1; i < y; i++) {
@@ -137,9 +135,11 @@ public class Genetico {
             nR = Math.abs(rnd.nextInt() % array.size());
             n = array.remove(nR);
             ++cromo[n];
+            coste += matriz[0][n];
         } while (!esSolucion(x, y, matriz, cromo));
         eliminaRedundancias(y, x, cromo, cubreOrdenado, matriz);
         esSolucion(x, y, matriz, cromo); //SOBRA
+        costes[num] = coste;
         return cromo;
     }
 
@@ -376,5 +376,39 @@ public class Genetico {
         }
         return factorizacion;
     }
-
+    
+    public void mutacionAGG(int tam) { //Ver si se puede hacer en un solo metodo
+        Random rand = new Random();
+        int pos = Math.abs( rand.nextInt() % descendencia.size());
+        int aux[] = descendencia.get(pos); //Se supone que estoy tocando la referencia
+        int prob; 
+        for(int i = 1; i <  tam; ++i){
+            prob = (int)(rand.nextDouble() * 100 + 1); 
+            if ((prob / 100) < probGen) {
+                aux[i] = (aux[i] == 1) ? 0 : 1;
+            }
+        }
+    }
+    
+    public void reinicialización(int x, int y, Pair cubreOrdenado[], int matriz[][]) {
+        int mejor = mejor();
+        int costeMejor = costes[mejor];
+        int copia[] = poblacion.get(mejor).clone();
+        poblacion.clear();
+        generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
+        poblacion.add(copia);
+        costes[tamPoblacion - 1] = costeMejor;      
+    }
+    
+    public int mejor() {
+        int mejor = costes[0];
+        int pos = 0;
+        for (int i = 1; i < tamPoblacion; ++i){
+            if (costes[i] < mejor) {
+                pos = i;
+                mejor = costes[i];
+            }
+        }
+        return pos;
+    }
 }
