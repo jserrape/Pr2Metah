@@ -33,7 +33,7 @@ public class Genetico {
         /////////////////////////////////////////
         //Esto me crea la primera descendencia de 50 pimpollos
 
-        //for (int z = 0; z < 400; z++) {
+        for (int z = 0; z < 400; z++) {
             Random rand = new Random();
             descendencia = new ArrayList<>();
             costesAux = new int[tamPoblacion];
@@ -63,7 +63,7 @@ public class Genetico {
                     System.out.println("Actualizo el peor a coste " + peorCoste + " de la pos " + pos);
                 }
             }
-            //Esto porque es?
+        
             mejorCoste = 99999999;
             for (int i = 0; i < tamPoblacion; i++) { //BUSCAR LA MEJOR DE LA POBLACION
                 if (costes[i] < mejorCoste) {
@@ -93,14 +93,23 @@ public class Genetico {
             }
 
             //PASO LOS DESCENDIENTES A POBLACION
-            poblacion = (ArrayList<int[]>) descendencia.clone();
+            //poblacion = (ArrayList<int[]>) descendencia.clone();
+            for (int i = 0; i < poblacion.size(); ++i) {
+                poblacion.set(i, descendencia.get(i).clone());
+            }
             System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
             System.out.println("Sustituyo a la poblacion anterior");
             
             //Aqui iria la mutacion? HAY QUE PREGUNTAR EL LUNES
-            if (rand.nextDouble() < 0.02) {
-                
+            boolean muta = true;
+            for(int i = 0; i < descendencia.size() && muta; ++i){
+                if (rand.nextDouble() < 0.02) {
+                    mutacionAGG(descendencia.get(i), i, matriz, x, y);
+                    arreglaSolucion(matriz, i, x, y, cubreOrdenado);
+                    muta = false;
+                }
             }
+            
 
             for (int i = 0; i < tamPoblacion; i++) {
                 System.out.println(i + ":\tpoblacion=" + costes[i] + "\tdescendientes=" + costesAux[i]);
@@ -108,7 +117,10 @@ public class Genetico {
             System.out.println("--------------------------------------");
             System.out.println("--------------------------------------");
             System.out.println("--------------------------------------");
-        //}
+            if (z % 20 == 0) {
+                probGen -= 0.01;
+            }
+        }
 
     }
 
@@ -377,17 +389,22 @@ public class Genetico {
         return factorizacion;
     }
     
-    public void mutacionAGG(int tam) { //Ver si se puede hacer en un solo metodo
+    public void mutacionAGG(int descendiente[], int num, int matriz[][], int x, int y) { 
         Random rand = new Random();
-        int pos = Math.abs( rand.nextInt() % descendencia.size());
-        int aux[] = descendencia.get(pos); //Se supone que estoy tocando la referencia
         int prob; 
-        for(int i = 1; i <  tam; ++i){
+        for(int i = 1; i <  y; ++i){
             prob = (int)(rand.nextDouble() * 100 + 1); 
             if ((prob / 100) < probGen) {
-                aux[i] = (aux[i] == 1) ? 0 : 1;
+                if (descendiente[i] == 1) {
+                    descendiente[i] = 0;
+                    costes[num] -= matriz[0][num];
+                } else {
+                    descendiente[i] = 1;
+                    costes[num] += matriz[0][num];
+                }
             }
         }
+        
     }
     
     public void reinicialización(int x, int y, Pair cubreOrdenado[], int matriz[][]) {
