@@ -28,7 +28,7 @@ public class Genetico {
         probGen = 0.2;
         costes = new int[tamPoblacion];
         Random rand = new Random();
-        int hijoFusion[], peorCoste, mejorCoste, pos = 0, pos2 = 0;
+        int peorCoste, mejorCoste, pos = 0, pos2 = 0;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
         for (int z = 0; z < 100; z++) {
             descendencia = new ArrayList<>();
@@ -41,19 +41,9 @@ public class Genetico {
                 int padre1 = torneoBinario(y, poblacion, matriz);
                 int padre2 = torneoBinario(y, poblacion, matriz);
                 if (rand.nextDouble() < 0.70) { //el 0 esta incluido
-                    hijoFusion = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
-                    esSolucionPrint(x, y, matriz, hijoFusion);
-                    descendencia.add(hijoFusion);
-                    arreglaSolucion(matriz, i, x, y, cubreOrdenado);
-                    esSolucionPrint(x, y, matriz, descendencia.get(i));
+                    cruceF(i,padre1,padre2,x,y,matriz,cubreOrdenado);
                 } else {
-                    if (costes[padre1] < costes[padre2]) {
-                        descendencia.add(poblacion.get(padre1));
-                        costesAux[i] = costes[padre1];
-                    } else {
-                        descendencia.add(poblacion.get(padre2));
-                        costesAux[i] = costes[padre2];
-                    }
+                    seleccionaPadre(i,padre1,padre2);
                 }   
                 if (peorCoste < costesAux[i]) { //PARA GUARDAR EL ELITISMO
                     peorCoste = costesAux[i];
@@ -62,8 +52,8 @@ public class Genetico {
                 }
             }
         
-            mejorCoste = 99999999;
-            for (int i = 0; i < tamPoblacion; i++) { //BUSCAR LA MEJOR DE LA POBLACION
+            mejorCoste = costes[0];
+            for (int i = 1; i < tamPoblacion; i++) { //BUSCAR LA MEJOR DE LA POBLACION
                 if (costes[i] < mejorCoste) {
                     mejorCoste = costes[i];
                     pos2 = i;
@@ -76,33 +66,21 @@ public class Genetico {
 
             //System.out.println("El mejor de la poblacion es el nº " + pos2 + " con coste " + mejorCoste);
             //System.out.println("El  peor  descendiente  es  el nº " + pos + " con coste " + peorCoste);
+            
+            
             //COPIO EL MEJOR DE LOA POBLACION SOBRE EL PEOR DE LOS DESCENDIENTES
-
             if (peorCoste > mejorCoste) {
                 //System.out.println("Intercambio elitismo");
                 descendencia.set(pos, poblacion.get(pos2));
                 costesAux[pos] = mejorCoste;
-            } else {
-                //System.out.println("POLLAS");
             }
    
             //Aqui iria la mutacion? HAY QUE PREGUNTAR EL LUNES
-            boolean muta = true;
-            for(int i = 0; i < descendencia.size() && muta; ++i){
-                if (rand.nextDouble() < 0.02) {
-                    mutacionAGG(descendencia.get(i), i, matriz, x, y); //<-------------------------------------
-                    arreglaSolucion(matriz, i, x, y, cubreOrdenado);
-                    muta = false;
-                }
-            }
+            mutacionAGG(matriz, x, y,cubreOrdenado);
             
             
             //AQUI DEBO COMPROBAR LA REINICIALIZACION
             boolean r=reinicializarConv();
-            if(r){
-                System.out.println("Reinicializacion necesaria en la vuelta "+z);
-                return;
-            }
              
 
             //PASO LOS DESCENDIENTES A POBLACION
@@ -112,10 +90,7 @@ public class Genetico {
             }
             System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
             System.out.println("Sustituyo a la poblacion anterior");
-            
-
-            
-
+           
             for (int i = 0; i < tamPoblacion; i++) {
                 //System.out.println(i + ":\tpoblacion=" + costes[i] + "\tdescendientes=" + costesAux[i]); //<---------------------------------------------------------------------
             }
@@ -127,6 +102,23 @@ public class Genetico {
 
     }
     
+    public void cruceF(int i,int padre1, int padre2,int x,int y,int matriz[][],Pair cubreOrdenado[]){
+        int hijoFusion[] = operadorFusion(y, poblacion.get(padre1), poblacion.get(padre2), matriz, padre1, padre2);
+        esSolucionPrint(x, y, matriz, hijoFusion);
+        descendencia.add(hijoFusion);
+        arreglaSolucion(matriz, i, x, y, cubreOrdenado);
+        esSolucionPrint(x, y, matriz, descendencia.get(i));
+    }
+    
+    public void seleccionaPadre(int i,int padre1,int padre2){
+        if (costes[padre1] < costes[padre2]) {
+            descendencia.add(poblacion.get(padre1));
+            costesAux[i] = costes[padre1];
+        } else {
+            descendencia.add(poblacion.get(padre2));
+            costesAux[i] = costes[padre2];
+        }
+    }
     
     public boolean reinicializarConv(){
         //System.out.println("VAMOH A REINICIALIZAR");
@@ -432,6 +424,19 @@ public class Genetico {
         return factorizacion;
     }
     
+    public void mutacionAGG(int matriz[][], int x, int y,Pair cubreOrdenado[]) { 
+        boolean muta = true;
+        Random rand = new Random();
+        for(int i = 0; i < descendencia.size() && muta; ++i){
+            if (rand.nextDouble() < 0.02) {
+                mutacionAGG(descendencia.get(i), i, matriz, x, y); //<-------------------------------------
+                arreglaSolucion(matriz, i, x, y, cubreOrdenado);
+                muta = false;
+            }
+        }
+    }
+    
+
     public void mutacionAGG(int descendiente[], int num, int matriz[][], int x, int y) { 
         Random rand = new Random();
         int prob; 
