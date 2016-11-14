@@ -127,13 +127,12 @@ public class Genetico {
         }
     }
     
-    
     public boolean reinicializarEstanc(){
         if(nGeneracion>=20){
-            System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
+            //System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
             return true;
         }
-        System.out.println("NO HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
+        //System.out.println("NO HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
         return false;
     }
     
@@ -166,16 +165,14 @@ public class Genetico {
         float porc=(float) (tamPoblacion*0.8);
         for(int i=0;i<tamReinicio;i++){
             if(reinicializacion[i].getCubre()>=porc){
-                System.out.println("HAY QUE REINICIALIZAR POR CONVERGENCIA");
+                //System.out.println("HAY QUE REINICIALIZAR POR CONVERGENCIA");
                 return true;
             }
         }
-        System.out.println("NO HAY QUE REINICIALIZAR POR CONVERGENCIA");
+        //System.out.println("NO HAY QUE REINICIALIZAR POR CONVERGENCIA");
         return false;
     }
     
-    
-
     public void generarPoblacion(int x, int y, int nPoblacion, Pair cubreOrdenado[], int matriz[][]) {
         for (int i = 0; i < nPoblacion; ++i) {
             poblacion.add(generarCromosoma(x, y, cubreOrdenado, matriz, i));
@@ -474,14 +471,12 @@ public class Genetico {
             if ((prob / 100) < probGen) {
                 if (descendiente[i] == 1) {
                     descendiente[i] = 0;
-                    costes[num] -= matriz[0][i];
                 } else {
                     descendiente[i] = 1;
-                    costes[num] += matriz[0][i];
                 }
             }
         }
-        
+        costesAux[num]=calculaSolucion(y, descendencia.get(num), matriz);
     }
     
     public void reinicialización(int x, int y, Pair cubreOrdenado[], int matriz[][]) {
