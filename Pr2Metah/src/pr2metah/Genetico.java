@@ -106,7 +106,7 @@ public class Genetico {
                 probGen -= 0.01;
             }
         }
-        System.out.println("Fin del algoritmo, el mejor tiene cosste "+mejorCoste);
+        System.out.println("Fin del algoritmo, el  mejor tiene cosste "+mejorCoste);
     }
     
     public void cruceF(int i,int padre1, int padre2,int x,int y,int matriz[][],Pair cubreOrdenado[]){
