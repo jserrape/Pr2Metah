@@ -38,6 +38,8 @@ public class Genetico {
         }
         descendencia = new ArrayList<>();
         costesAux = new int[tamPoblacion];
+        int muta = (Math.abs(rand.nextInt() % tamPoblacion));
+        
         for (int i = 0; i < 1; i++) {
             tabu = -1;
             int padre1 = torneoBinario(y, poblacion, matriz);
@@ -50,6 +52,9 @@ public class Genetico {
                 cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
                 //mutacionAGG(matriz, x, y, cubreOrdenado);
                 //AQUI ARREGLO LA SOLUCION
+                if (i == muta) {
+                    mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
+                }
                 arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(0));
                 //AQUI ELIMINO LAS REDUNDANCIAS
                 eliminaRedundancias(y, x, descendencia.get(0), cubreOrdenado, matriz);
@@ -57,9 +62,16 @@ public class Genetico {
                 System.out.println("El puto hijo tiene coste "+calculaSolucion(y,descendencia.get(0),matriz));
                 esSolucionPrint(x, y, matriz, descendencia.get(0));
             } else {
-                System.out.println("Selecciono uno de los padres");
-                seleccionaPadre(i, padre1, padre2);
-                //AQUI METO EL COSTE EN COSTEAUX
+                if (i == muta) {
+                    mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
+                    arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+                    eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
+                    calculaSolucion(y,descendencia.get(i),matriz);
+                } else {
+                    System.out.println("Selecciono uno de los padres");
+                    seleccionaPadre(i, padre1, padre2);
+                    //AQUI METO EL COSTE EN COSTEAUX
+                }
             }
 
             //AQUI BUSCO EL MEJOR DE LA POBLACION
@@ -67,6 +79,7 @@ public class Genetico {
             //AQUI LOS INTERCAMBIO
             System.out.println("\n");
         }
+        //
     }
 
     public void arreglaSol(int x, int y, int matriz[][], Pair cubreOrdenado[], int sol[]) {
@@ -152,29 +165,14 @@ public class Genetico {
         }
     }
 
-    public void mutacionAGG(int matriz[][], int x, int y, Pair cubreOrdenado[]) {
-        boolean muta = true;
-        Random rand = new Random();
-        for (int i = 0; i < descendencia.size() && muta; ++i) {
-            if (rand.nextDouble() < 0.02) {
-                mutacionAGG(descendencia.get(i), i, matriz, x, y);
-                muta = false;
-            }
-        }
-    }
-
-    public void mutacionAGG(int descendiente[], int num, int matriz[][], int x, int y) {
+    public void mutacionAGG(int pos, int y) {
         Random rand = new Random();
         float prob;
         for (int i = 1; i < y; ++i) {
             prob = (float) (Math.abs(rand.nextInt() % 101)) / 100;
             if (prob < probGen) {
-                if (descendiente[i] == 1) {
-                    descendiente[i] = 0;
-                } else {
-                    descendiente[i] = 1;
-                }
-            }
+                descendencia.get(pos)[i] = (descendencia.get(pos)[i] == 1) ? 0 : 1;
+            }      
         }
     }
 
@@ -333,7 +331,7 @@ public class Genetico {
                     }
                 }
                 if (columnaRedundante) {
-                    System.out.println("REDUNDANTEE");
+                    //System.out.println("REDUNDANTEE");
                     solucion[quito] = 0;
                 }
             }
