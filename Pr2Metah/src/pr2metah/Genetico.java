@@ -50,110 +50,70 @@ public class Genetico {
                 cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
                 //mutacionAGG(matriz, x, y, cubreOrdenado);
                 //AQUI ARREGLO LA SOLUCION
-                //AQUI ELIMINO LAS REDUNDANCIAS
-                //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
-                esSolucionPrint(x, y, matriz, descendencia.get(0));
                 arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(0));
+                //AQUI ELIMINO LAS REDUNDANCIAS
+                eliminaRedundancias(y, x, descendencia.get(0), cubreOrdenado, matriz);
+                //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
+                System.out.println("El puto hijo tiene coste "+calculaSolucion(y,descendencia.get(0),matriz));
+                esSolucionPrint(x, y, matriz, descendencia.get(0));
             } else {
                 System.out.println("Selecciono uno de los padres");
                 seleccionaPadre(i, padre1, padre2);
                 //AQUI METO EL COSTE EN COSTEAUX
             }
 
+            //AQUI BUSCO EL MEJOR DE LA POBLACION
+            //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
+            //AQUI LOS INTERCAMBIO
             System.out.println("\n");
         }
     }
 
     public void arreglaSol(int x, int y, int matriz[][], Pair cubreOrdenado[], int sol[]) {
-        int cubiertos[] = new int[x];
-        for (int i = 1; i < x; i++) {
-            cubiertos[i] = 0;
-        }
-        for (int c = 1; c < y; c++) {
-            if (sol[c] == 1) {
-                for (int f = 1; f < x; f++) {
-                    if (matriz[f][c] == 1) {
-                        cubiertos[f] = 1;
+        while (true) {
+            int cubiertos[] = new int[x];
+            for (int i = 1; i < x; i++) {
+                cubiertos[i] = 0;
+            }
+            for (int c = 1; c < y; c++) {
+                if (sol[c] == 1) {
+                    for (int f = 1; f < x; f++) {
+                        if (matriz[f][c] == 1) {
+                            cubiertos[f] = 1;
+                        }
                     }
                 }
             }
-        }
-        System.out.println(Arrays.toString(cubiertos));
-        int cubre[] = new int[y];
-        for (int i = 0; i < y; i++) {
-            cubre[i] = 0;
-        }
-        for (int f = 1; f < x; f++) {
-            if (cubiertos[f] == 0) {
-                for (int c = 1; c < y; c++) {
-                    if (matriz[f][c] == 1) {
-                        ++cubre[c];
+            System.out.println(Arrays.toString(cubiertos));
+            int cubre[] = new int[y];
+            for (int i = 0; i < y; i++) {
+                cubre[i] = 0;
+            }
+            for (int f = 1; f < x; f++) {
+                if (cubiertos[f] == 0) {
+                    for (int c = 1; c < y; c++) {
+                        if (matriz[f][c] == 1) {
+                            ++cubre[c];
+                        }
                     }
                 }
             }
-        }
-        System.out.println(Arrays.toString(cubre));
-        float ratio[] = new float[y];
-        rellenarRatio(y, matriz, cubre, ratio);
-        System.out.println("antes del mayor ratio");
-        buscarMayorRatio(y, x, ratio, cubre, sol, matriz);
-        System.out.println("despues del mayor ratio");
-        while (faltanPorCubrir(y, cubre)) {
-            buscarMayorRatio(y, x, ratio, cubre, sol, matriz);
-            rellenarRatio(y, matriz, cubre, ratio);
-        }
-
-    }
-
-    public void buscarMayorRatio(int x, int y, float ratio[], int cubre[], int solucion[], int matriz[][]) {
-        int mayor = 1;
-        int aux[] = new int[x];
-        int n = 1;
-        aux[0] = 1;
-        for (int i = 2; i < x; i++) {
-            if (ratio[i] >= ratio[mayor]) {
-                if (ratio[i] == ratio[mayor]) { //Añado a la lista
-                    aux[n] = i;
-                    ++n;
-                    mayor = i;
-                } else { //reinicio la lista
-                    aux[0] = i;
-                    n = 1;
-                    mayor = i;
+            System.out.println(Arrays.toString(cubre));
+            float ratio[] = new float[y];
+            float mayor = (float) cubre[1] / matriz[0][1];
+            int pos = 1;
+            for (int i = 2; i < y; i++) {
+                if (((float) cubre[i] / matriz[0][i]) > mayor) {
+                    mayor = (float) cubre[i] / matriz[0][i];
+                    pos = i;
                 }
             }
-        }
-
-        Random rand = new Random();
-        int nRand = (int) (rand.nextDouble() * n);
-        mayor = aux[nRand];
-
-        solucion[mayor] = 1;
-        for (int i = 1; i < y; i++) {
-            if (matriz[i][mayor] == 1 && matriz[i][0] == 0) {
-                ++matriz[i][0];
-                for (int j = 1; j < x; j++) {
-                    if (matriz[i][j] == 1) {
-                        --cubre[j];
-                    }
-                }
+            if (mayor == 0) {
+                return;
             }
-        }
-    }
-
-    public boolean faltanPorCubrir(int x, int cubre[]) {
-        for (int i = 1; i < x; i++) {
-            if (cubre[i] != 0) {
-                System.out.println("FALTA");
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void rellenarRatio(int y, int matriz[][], int cubre[], float ratio[]) {
-        for (int i = 1; i < y; i++) {
-            ratio[i] = (float) cubre[i] / matriz[0][i];
+            System.out.println("El mejor tiene ratio " + mayor + " en la pos " + pos);
+            sol[pos] = 1;
+            System.out.println(Arrays.toString(sol));
         }
     }
 
@@ -373,7 +333,7 @@ public class Genetico {
                     }
                 }
                 if (columnaRedundante) {
-                    //System.out.println("REDUNDANTEE");
+                    System.out.println("REDUNDANTEE");
                     solucion[quito] = 0;
                 }
             }
@@ -399,5 +359,15 @@ public class Genetico {
         }
         System.out.println("-----------------------> si es solucion <-------------------");
         return true;
+    }
+
+    public int calculaSolucion(int y, int solucion[], int mat[][]) {
+        int coste = 0;
+        for (int i = 1; i < y; i++) {
+            if (solucion[i] == 1) {
+                coste += mat[0][i];
+            }
+        }
+        return coste;
     }
 }
