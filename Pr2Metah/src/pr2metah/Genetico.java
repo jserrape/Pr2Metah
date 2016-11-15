@@ -57,19 +57,22 @@ public class Genetico {
                 }
                 arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(0));
                 //AQUI ELIMINO LAS REDUNDANCIAS
-                eliminaRedundancias(y, x, descendencia.get(0), cubreOrdenado, matriz);
+                eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
                 //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
-                System.out.println("El puto hijo tiene coste "+calculaSolucion(y,descendencia.get(0),matriz));
-                esSolucionPrint(x, y, matriz, descendencia.get(0));
+                System.out.println("El puto hijo tiene coste "+calculaSolucion(y,descendencia.get(i),matriz));
+                esSolucionPrint(x, y, matriz, descendencia.get(i));
+                costesAux[i] = calculaSolucion(y,descendencia.get(i),matriz);
             } else {
                 if (i == muta) {
+                    seleccionaPadre(i, padre1, padre2);
                     mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
                     arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
                     eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
-                    calculaSolucion(y,descendencia.get(i),matriz);
+                    costesAux[i] = calculaSolucion(y,descendencia.get(i),matriz);
                 } else {
                     System.out.println("Selecciono uno de los padres");
                     seleccionaPadre(i, padre1, padre2);
+                    costesAux[i] = calculaSolucion(y,descendencia.get(i),matriz);
                     //AQUI METO EL COSTE EN COSTEAUX
                 }
             }
@@ -151,7 +154,7 @@ public class Genetico {
             if (rand.nextDouble() < 0.70) {
                 System.out.println("Cruzo a los padres");
                 cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
-                mutacionAGG(matriz, x, y, cubreOrdenado);
+                //mutacionAGG(matriz, x, y, cubreOrdenado);
                 //AQUI ARREGLO LA SOLUCION
                 //AQUI ELIMINO LAS REDUNDANCIAS
                 //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
