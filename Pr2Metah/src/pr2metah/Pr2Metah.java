@@ -129,7 +129,8 @@ public class Pr2Metah {
         leerFichero(ficheros[0]);
         inicializo();
         gen=new Genetico();
-        gen.mainGenetico(x, y, matriz, cubre, cubreOrdenado);
+        //gen.mainGenetico(x, y, matriz, cubre, cubreOrdenado);
+        gen.prueba(x, y, matriz, cubre, cubreOrdenado);
 
     }
 
