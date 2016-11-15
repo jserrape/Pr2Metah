@@ -33,56 +33,84 @@ public class Genetico {
         costes = new int[tamPoblacion];
         Random rand = new Random();
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
+
         for (int i = 0; i < tamPoblacion; i++) {
             System.out.println(i + ": " + costes[i]);
         }
+        System.out.println();
+
         descendencia = new ArrayList<>();
         costesAux = new int[tamPoblacion];
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
-        
-        for (int i = 0; i < 1; i++) {
-            tabu = -1;
-            int padre1 = torneoBinario(y, poblacion, matriz);
-            System.out.println("Gana el padre1 " + padre1);
-            int padre2 = torneoBinario(y, poblacion, matriz);
-            System.out.println("Gana el padre2 " + padre2);
 
-            if (rand.nextDouble() < 0.70) {
-                System.out.println("Cruzo a los padres");
-                cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
-                //mutacionAGG(matriz, x, y, cubreOrdenado);
-                //AQUI ARREGLO LA SOLUCION
-                if (i == muta) {
-                    mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
-                }
-                arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(0));
-                //AQUI ELIMINO LAS REDUNDANCIAS
-                eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
-                //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
-                System.out.println("El puto hijo tiene coste "+calculaSolucion(y,descendencia.get(i),matriz));
-                esSolucionPrint(x, y, matriz, descendencia.get(i));
-                costesAux[i] = calculaSolucion(y,descendencia.get(i),matriz);
-            } else {
-                if (i == muta) {
+        for (int z = 0; z < 400; z++) {
+            for (int i = 0; i < 50; i++) {
+                tabu = -1;
+                int padre1 = torneoBinario(y, poblacion, matriz);
+                int padre2 = torneoBinario(y, poblacion, matriz);
+                if (rand.nextDouble() < 0.70) {
+                    //AQUI CRUZO
+                    cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
+                    //AQUI MUTO
+                    if (i == muta) {
+                        mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
+                    }
+                    //AQUI ARREGLO LA SOLUCION
+                    arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+                    //AQUI ELIMINO LAS REDUNDANCIAS
+                    eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
+                    //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
+                    costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
+                    esSolucionPrint(x, y, matriz, descendencia.get(i));
+                } else if (i == muta) {
                     seleccionaPadre(i, padre1, padre2);
                     mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
                     arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
                     eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
-                    costesAux[i] = calculaSolucion(y,descendencia.get(i),matriz);
+                    costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
+                    esSolucionPrint(x, y, matriz, descendencia.get(i));
                 } else {
-                    System.out.println("Selecciono uno de los padres");
                     seleccionaPadre(i, padre1, padre2);
-                    costesAux[i] = calculaSolucion(y,descendencia.get(i),matriz);
-                    //AQUI METO EL COSTE EN COSTEAUX
+                    esSolucionPrint(x, y, matriz, descendencia.get(i));
                 }
             }
-
+            
             //AQUI BUSCO EL MEJOR DE LA POBLACION
+            int mejorP = 1;
+            for (int i = 2; i < tamPoblacion; i++) {
+                if (costes[mejorP] > costes[i]) {
+                    mejorP = i;
+                }
+            }
+            System.out.println("El  mejor coste  de  los  padres  es  el\t" + costes[mejorP]);
+            
             //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
-            //AQUI LOS INTERCAMBIO
+            int peorD = 1;
+            for (int i = 2; i > tamPoblacion; i++) {
+                if (costesAux[peorD] > costesAux[i]) {
+                    peorD = i;
+                }
+            }
+            System.out.println("El peor coste de los descendientes es el\t" + costesAux[peorD]);
+            
+            //AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
+            int peor[]=descendencia.get(peorD);
+            int mejor[]=poblacion.get(mejorP);
+            System.arraycopy(mejor, 0, peor, 0, y);
+            costesAux[peorD]=costes[mejorP];
+            
+            //AQUI INTERCAMBIO LAS POBLACIONES
+            for (int i = 0; i < poblacion.size(); ++i) {
+                poblacion.set(i, descendencia.get(i).clone());
+            }
+            System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
+            
+            ////////////////////////////////////////////////////////
+            for (int i = 0; i < 50; i++) {
+                //System.out.println(i + ":\t" + costesAux[i]);          //<------------------------------------
+            }
             System.out.println("\n");
         }
-        //
     }
 
     public void arreglaSol(int x, int y, int matriz[][], Pair cubreOrdenado[], int sol[]) {
@@ -100,7 +128,7 @@ public class Genetico {
                     }
                 }
             }
-            System.out.println(Arrays.toString(cubiertos));
+            //System.out.println(Arrays.toString(cubiertos));
             int cubre[] = new int[y];
             for (int i = 0; i < y; i++) {
                 cubre[i] = 0;
@@ -114,7 +142,7 @@ public class Genetico {
                     }
                 }
             }
-            System.out.println(Arrays.toString(cubre));
+            //System.out.println(Arrays.toString(cubre));
             float ratio[] = new float[y];
             float mayor = (float) cubre[1] / matriz[0][1];
             int pos = 1;
@@ -127,9 +155,9 @@ public class Genetico {
             if (mayor == 0) {
                 return;
             }
-            System.out.println("El mejor tiene ratio " + mayor + " en la pos " + pos);
+            //System.out.println("El mejor tiene ratio " + mayor + " en la pos " + pos);
             sol[pos] = 1;
-            System.out.println(Arrays.toString(sol));
+            //System.out.println(Arrays.toString(sol));
         }
     }
 
@@ -139,7 +167,7 @@ public class Genetico {
         Random rand = new Random();
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
         for (int i = 0; i < tamPoblacion; i++) {
-            System.out.println(i + ": " + costes[i]);
+            //System.out.println(i + ": " + costes[i]);
         }
         /////////////////////////////////////////////////////////////
         descendencia = new ArrayList<>();
@@ -147,24 +175,24 @@ public class Genetico {
         for (int i = 0; i < tamPoblacion; i++) {
             tabu = -1;
             int padre1 = torneoBinario(y, poblacion, matriz);
-            System.out.println("Gana el padre1 " + padre1);
+            //System.out.println("Gana el padre1 " + padre1);
             int padre2 = torneoBinario(y, poblacion, matriz);
-            System.out.println("Gana el padre2 " + padre2);
+            // System.out.println("Gana el padre2 " + padre2);
 
             if (rand.nextDouble() < 0.70) {
-                System.out.println("Cruzo a los padres");
+                //System.out.println("Cruzo a los padres");
                 cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
                 //mutacionAGG(matriz, x, y, cubreOrdenado);
                 //AQUI ARREGLO LA SOLUCION
                 //AQUI ELIMINO LAS REDUNDANCIAS
                 //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
             } else {
-                System.out.println("Selecciono uno de los padres");
+                //System.out.println("Selecciono uno de los padres");
                 seleccionaPadre(i, padre1, padre2);
                 //AQUI METO EL COSTE EN COSTEAUX
             }
 
-            System.out.println("\n");
+            //System.out.println("\n");
         }
     }
 
@@ -175,7 +203,7 @@ public class Genetico {
             prob = (float) (Math.abs(rand.nextInt() % 101)) / 100;
             if (prob < probGen) {
                 descendencia.get(pos)[i] = (descendencia.get(pos)[i] == 1) ? 0 : 1;
-            }      
+            }
         }
     }
 
@@ -199,9 +227,9 @@ public class Genetico {
                 }
             }
         }
-        System.out.println(Arrays.toString(copia1));
-        System.out.println(Arrays.toString(copia2));
-        System.out.println(Arrays.toString(hijo));
+        //System.out.println(Arrays.toString(copia1));
+        //System.out.println(Arrays.toString(copia2));
+        //System.out.println(Arrays.toString(hijo));
         descendencia.add(hijo);
         //arreglaSolucion(matriz, i, x, y, cubreOrdenado);
         //eliminaRedundancias(x, y, descendencia.get(i), cubreOrdenado, matriz);
@@ -233,22 +261,22 @@ public class Genetico {
 
     public void seleccionaPadre(int i, int padre1, int padre2) {
         if (costes[padre1] < costes[padre2]) {
-            System.out.println("He escogido el padre 1");
+            //System.out.println("He escogido el padre 1");
             descendencia.add(poblacion.get(padre1));
-            costesAux[i] = costes[padre1];  //PUEDE SOBRAR A LA LARGA
+            costesAux[i] = costes[padre1];
         } else {
-            System.out.println("He escogido el padre 1");
+            //System.out.println("He escogido el padre 1");
             descendencia.add(poblacion.get(padre2));
-            costesAux[i] = costes[padre2];  //PUEDE SOBRAR A LA LARGA
+            costesAux[i] = costes[padre2];
         }
     }
 
     public int torneoBinario(int y, ArrayList<int[]> poblacion, int mat[][]) {
         Random rnd = new Random();
         int n1 = Math.abs(rnd.nextInt() % poblacion.size());
-        System.out.println("Pposible padre 1 :" + n1 + "\t con coste " + costes[n1]);
+        //System.out.println("Pposible padre 1 :" + n1 + "\t con coste " + costes[n1]);
         int n2 = Math.abs(rnd.nextInt() % poblacion.size());
-        System.out.println("Pposible padre 2 :" + n2 + "\t con coste " + costes[n2]);
+        //System.out.println("Pposible padre 2 :" + n2 + "\t con coste " + costes[n2]);
         while (n1 == n2 || n1 == tabu || n2 == tabu) {
             n1 = Math.abs(rnd.nextInt() % poblacion.size());
             n2 = Math.abs(rnd.nextInt() % poblacion.size());
@@ -354,11 +382,11 @@ public class Genetico {
                 }
             }
             if (!ok) {
-                System.out.println("-----------------------> NO ES SOLUCION <-------------------");
+                //System.out.println("-----------------------> NO ES SOLUCION <-------------------");
                 return false;
             }
         }
-        System.out.println("-----------------------> si es solucion <-------------------");
+        //System.out.println("-----------------------> si es solucion <-------------------");
         return true;
     }
 
