@@ -145,6 +145,13 @@ public class Genetico {
                     nGeneracion = 0;
                 }
             }
+        int mejor = costes[0];
+        for (int i = 1; i < tamPoblacion; ++i) {
+            if (costes[i] < mejor) {
+                mejor = costes[i];
+            }
+        }
+        System.out.println("ALGORITMO ACABO EL MEJOR COSTE ENCONTRADO ES DE: " + mejor);
     }
 
     public boolean reinicializarEstanc() {
