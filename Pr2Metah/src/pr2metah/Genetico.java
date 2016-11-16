@@ -31,6 +31,7 @@ public class Genetico {
     public void prueba(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[]) {
         poblacion = new ArrayList<>();
         costes = new int[tamPoblacion];
+        descendencia = new ArrayList<>();
         Random rand = new Random();
         nGeneracion = 0;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
@@ -40,17 +41,20 @@ public class Genetico {
         }
         System.out.println();
 
-        descendencia = new ArrayList<>();
+        descendencia.clear();
         costesAux = new int[tamPoblacion];
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
         for (int z = 0; z < 400; z++) {
+            System.out.println("-------- VUELTA "+z+" --------");
             descendencia = new ArrayList<>();
             costesAux = new int[tamPoblacion];
             ++nGeneracion;
             for (int i = 0; i < 50; i++) {
+                System.out.println("-------- HA CREAR EL PIMPOLLO "+i+" --------");
                 tabu = -1;
                 int padre1 = torneoBinario(y, poblacion, matriz);
                 int padre2 = torneoBinario(y, poblacion, matriz);
+                System.out.println("-------- CREADOS LOS PADRES DEL "+i+" --------");
                 if (rand.nextDouble() < 0.70) {
                     //AQUI CRUZO
                     cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
@@ -76,8 +80,10 @@ public class Genetico {
                     seleccionaPadre(i, padre1, padre2);
                     esSolucionPrint(x, y, matriz, descendencia.get(i));
                 }
+                System.out.println("-------- CREADO EL PIMPOLLO "+i+" --------");
             }
-
+            System.out.println("-------- FIN DE CREAR PIMPOLLOS--------");
+            
             //AQUI BUSCO EL MEJOR DE LA POBLACION
             int mejorP = 1;
             for (int i = 2; i < tamPoblacion; i++) {
@@ -98,28 +104,40 @@ public class Genetico {
 
             if (reinicializarEstanc() || reinicializarConv()) {
                 System.out.println("-------- VOY A REINICIAR --------");
-                /*
                 int mejor[] = poblacion.get(mejorP).clone();
-                int aux= costesAux[mejorP];
-                descendencia = new ArrayList<>();
+                int aux = costes[mejorP];
+                descendencia.clear();
                 costesAux = new int[tamPoblacion];
                 generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
                 descendencia.add(mejor);
                 costesAux[tamPoblacion - 1] = aux;
                 nGeneracion = 0;
-                */
-            } else {
-                //AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
+                System.out.println("-------- DESCENDENCIA TIENE TAM "+descendencia.size()+" --------");
+                System.out.println("-------- DEP --------");
+            } else //AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
+            if (costes[mejorP] > costesAux[peorD]) {
                 int peor[] = descendencia.get(peorD);
                 int mejor[] = poblacion.get(mejorP);
                 System.arraycopy(mejor, 0, peor, 0, y);
                 costesAux[peorD] = costes[mejorP];
+            } else {
+                System.out.println("Se ha encontrado un resultado mejor");
+                nGeneracion = 0;
             }
             //AQUI INTERCAMBIO LAS POBLACIONES
-            for (int i = 0; i < poblacion.size(); ++i) {
-                poblacion.set(i, descendencia.get(i).clone());
+            //System.out.println("Poblacion tiene tam "+poblacion.size());
+            //System.out.println("Descendencia tiene tam "+descendencia.size());
+            System.out.println("-------- VOY A SUSTITUIR --------");
+            poblacion.clear();
+            for (int i = 0; i < descendencia.size(); ++i) {
+                poblacion.add(descendencia.get(i).clone());
+                //poblacion.set(i, descendencia.get(i).clone());
             }
+            System.out.println("-------- HE SUSTITUIDO LA GENERACION --------");
+            //System.out.println("Poblacion2 tiene tam "+poblacion.size());
+            //System.out.println("Descendencia2 tiene tam "+descendencia.size());
             System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
+            System.out.println("-------- HE SUSTITUIDO LOS COSTES --------");
 
             ////////////////////////////////////////////////////////
             for (int i = 0; i < 50; i++) {
@@ -131,7 +149,7 @@ public class Genetico {
 
     public boolean reinicializarEstanc() {
         if (nGeneracion >= 20) {
-            System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
+            System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO");   //MAAAAAAAAAAL
             return true;
         }
         System.out.println("NO HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
