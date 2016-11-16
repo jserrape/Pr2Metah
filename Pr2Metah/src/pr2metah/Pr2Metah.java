@@ -126,7 +126,7 @@ public class Pr2Metah {
         String ficheros[] = {"scpe1.txt", "scp41.txt", "scpd1.txt", "scpnrf1.txt", "scpa1.txt"};
         int n = 5;
         Genetico gen;
-        leerFichero(ficheros[3]);
+        leerFichero(ficheros[0]);
         inicializo();
         gen=new Genetico();
         //gen.mainGenetico(x, y, matriz, cubre, cubreOrdenado);

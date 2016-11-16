@@ -31,6 +31,7 @@ public class Genetico {
         poblacion = new ArrayList<>();
         costes = new int[tamPoblacion];
         Random rand = new Random();
+        nGeneracion = 0;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
 
         for (int i = 0; i < tamPoblacion; i++) {
@@ -41,8 +42,10 @@ public class Genetico {
         descendencia = new ArrayList<>();
         costesAux = new int[tamPoblacion];
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
-
         for (int z = 0; z < 400; z++) {
+            descendencia = new ArrayList<>();
+            costesAux = new int[tamPoblacion];
+            ++nGeneracion;
             for (int i = 0; i < 50; i++) {
                 tabu = -1;
                 int padre1 = torneoBinario(y, poblacion, matriz);
@@ -73,7 +76,7 @@ public class Genetico {
                     esSolucionPrint(x, y, matriz, descendencia.get(i));
                 }
             }
-            
+
             //AQUI BUSCO EL MEJOR DE LA POBLACION
             int mejorP = 1;
             for (int i = 2; i < tamPoblacion; i++) {
@@ -82,7 +85,7 @@ public class Genetico {
                 }
             }
             System.out.println("El  mejor coste  de  los  padres  es  el\t" + costes[mejorP]);
-            
+
             //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
             int peorD = 1;
             for (int i = 2; i > tamPoblacion; i++) {
@@ -91,19 +94,32 @@ public class Genetico {
                 }
             }
             System.out.println("El peor coste de los descendientes es el\t" + costesAux[peorD]);
-            
-            //AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
-            int peor[]=descendencia.get(peorD);
-            int mejor[]=poblacion.get(mejorP);
-            System.arraycopy(mejor, 0, peor, 0, y);
-            costesAux[peorD]=costes[mejorP];
-            
+
+            if (reinicializarEstanc() || reinicializarConv()) {
+                System.out.println("-------- VOY A REINICIAR --------");
+                /*
+                int mejor[] = poblacion.get(mejorP).clone();
+                int aux= costesAux[mejorP];
+                descendencia = new ArrayList<>();
+                costesAux = new int[tamPoblacion];
+                generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
+                descendencia.add(mejor);
+                costesAux[tamPoblacion - 1] = aux;
+                nGeneracion = 0;
+                */
+            } else {
+                //AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
+                int peor[] = descendencia.get(peorD);
+                int mejor[] = poblacion.get(mejorP);
+                System.arraycopy(mejor, 0, peor, 0, y);
+                costesAux[peorD] = costes[mejorP];
+            }
             //AQUI INTERCAMBIO LAS POBLACIONES
             for (int i = 0; i < poblacion.size(); ++i) {
                 poblacion.set(i, descendencia.get(i).clone());
             }
             System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
-            
+
             ////////////////////////////////////////////////////////
             for (int i = 0; i < 50; i++) {
                 //System.out.println(i + ":\t" + costesAux[i]);          //<------------------------------------
@@ -113,6 +129,52 @@ public class Genetico {
                 probGen -= 0.01;
             }
         }
+    }
+
+    public boolean reinicializarEstanc() {
+        if (nGeneracion >= 20) {
+            System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
+            return true;
+        }
+        System.out.println("NO HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
+        return false;
+    }
+
+    public boolean reinicializarConv() {
+        Pair reinicializacion[];
+        int tamReinicio = 0, donde = 0;
+        reinicializacion = new Pair[tamPoblacion];
+        boolean encontrado;
+
+        for (int i = 0; i < tamPoblacion; i++) {
+            encontrado = false;
+            for (int j = 0; j < tamReinicio; j++) {
+                if (reinicializacion[j].getLugar() == costesAux[i]) {
+                    encontrado = true;
+                    donde = j;
+                }
+            }
+            if (encontrado) {
+                reinicializacion[donde].aumentaCubre();
+            } else {
+                reinicializacion[tamReinicio] = new Pair(costesAux[i], 1);
+                ++tamReinicio;
+            }
+        }
+        System.out.println("Hay " + tamReinicio + " distintos en la poblacion");
+        for (int i = 0; i < tamReinicio; i++) {
+            System.out.print(reinicializacion[i].getLugar() + ":" + reinicializacion[i].getCubre() + "  ");
+        }
+        System.out.println("\n");
+        float porc = (float) (tamPoblacion * 0.8);
+        for (int i = 0; i < tamReinicio; i++) {
+            if (reinicializacion[i].getCubre() >= porc) {
+                System.out.println("HAY QUE REINICIALIZAR POR CONVERGENCIA");
+                return true;
+            }
+        }
+        System.out.println("NO HAY QUE REINICIALIZAR POR CONVERGENCIA");
+        return false;
     }
 
     public void arreglaSol(int x, int y, int matriz[][], Pair cubreOrdenado[], int sol[]) {
