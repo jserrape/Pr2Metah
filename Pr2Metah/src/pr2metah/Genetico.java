@@ -6,7 +6,6 @@
 package pr2metah;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -45,16 +44,16 @@ public class Genetico {
         costesAux = new int[tamPoblacion];
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
         for (int z = 0; z < 400; z++) {
-            System.out.println("-------- VUELTA "+z+" --------");
+            System.out.println("-------- VUELTA " + z + " --------");
             descendencia = new ArrayList<>();
             costesAux = new int[tamPoblacion];
             ++nGeneracion;
             for (int i = 0; i < 50; i++) {
-                System.out.println("-------- HA CREAR EL PIMPOLLO "+i+" --------");
+                System.out.println("-------- HA CREAR EL PIMPOLLO " + i + " --------");
                 tabu = -1;
                 int padre1 = torneoBinario(y, poblacion, matriz);
                 int padre2 = torneoBinario(y, poblacion, matriz);
-                System.out.println("-------- CREADOS LOS PADRES DEL "+i+" --------");
+                System.out.println("-------- CREADOS LOS PADRES DEL " + i + " --------");
                 if (rand.nextDouble() < 0.70) {
                     //AQUI CRUZO
                     cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
@@ -80,10 +79,10 @@ public class Genetico {
                     seleccionaPadre(i, padre1, padre2);
                     esSolucionPrint(x, y, matriz, descendencia.get(i));
                 }
-                System.out.println("-------- CREADO EL PIMPOLLO "+i+" --------");
+                System.out.println("-------- CREADO EL PIMPOLLO " + i + " --------");
             }
             System.out.println("-------- FIN DE CREAR PIMPOLLOS--------");
-            
+
             //AQUI BUSCO EL MEJOR DE LA POBLACION
             int mejorP = 1;
             for (int i = 2; i < tamPoblacion; i++) {
@@ -102,28 +101,6 @@ public class Genetico {
             }
             System.out.println("El peor coste de los descendientes es el\t" + costesAux[peorD]);
 
-            if (reinicializarEstanc() || reinicializarConv()) {
-                System.out.println("-------- VOY A REINICIAR --------");
-                int mejor[] = poblacion.get(mejorP).clone();
-                int aux = costes[mejorP];
-                descendencia.clear();
-                costesAux = new int[tamPoblacion];
-                generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
-                descendencia.add(mejor);
-                costesAux[tamPoblacion - 1] = aux;
-                nGeneracion = 0;
-                System.out.println("-------- DESCENDENCIA TIENE TAM "+descendencia.size()+" --------");
-                System.out.println("-------- DEP --------");
-            } else //AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
-            if (costes[mejorP] > costesAux[peorD]) {
-                int peor[] = descendencia.get(peorD);
-                int mejor[] = poblacion.get(mejorP);
-                System.arraycopy(mejor, 0, peor, 0, y);
-                costesAux[peorD] = costes[mejorP];
-            } else {
-                System.out.println("Se ha encontrado un resultado mejor");
-                nGeneracion = 0;
-            }
             //AQUI INTERCAMBIO LAS POBLACIONES
             //System.out.println("Poblacion tiene tam "+poblacion.size());
             //System.out.println("Descendencia tiene tam "+descendencia.size());
@@ -144,7 +121,30 @@ public class Genetico {
                 //System.out.println(i + ":\t" + costesAux[i]);          //<------------------------------------
             }
             System.out.println("\n");
-        }
+
+            if (reinicializarEstanc() || reinicializarConv()) {
+                System.out.println("-------- VOY A REINICIAR --------");
+                int mejor[] = poblacion.get(mejorP).clone();
+                int aux = costes[mejorP];
+                poblacion.clear();
+                costes = new int[tamPoblacion];
+                generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
+                poblacion.add(mejor);
+                costes[tamPoblacion - 1] = aux;
+                nGeneracion = 0;
+                System.out.println("-------- DESCENDENCIA TIENE TAM " + descendencia.size() + " --------");
+                System.out.println("-------- DEP --------");
+            } else//AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
+                if (costes[mejorP] > costesAux[peorD]) {
+                    int peor[] = descendencia.get(peorD);
+                    int mejor[] = poblacion.get(mejorP);
+                    System.arraycopy(mejor, 0, peor, 0, y);
+                    costesAux[peorD] = costes[mejorP];
+                } else {
+                    System.out.println("Se ha encontrado un resultado mejor");
+                    nGeneracion = 0;
+                }
+            }
     }
 
     public boolean reinicializarEstanc() {
