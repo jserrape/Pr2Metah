@@ -6,6 +6,7 @@
 package pr2metah;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -125,9 +126,6 @@ public class Genetico {
                 //System.out.println(i + ":\t" + costesAux[i]);          //<------------------------------------
             }
             System.out.println("\n");
-            if (z % 20 == 0) {
-                probGen -= 0.01;
-            }
         }
     }
 
