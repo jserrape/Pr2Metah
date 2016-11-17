@@ -13,8 +13,8 @@ import java.util.Random;
  * @author Xenahort
  *
  *
- * EN EL SELECCIONA PADRE HABRIA QUE PLANTEARSE COGERLO ALEATORIO REVISAR LO DE
- * LA VARIABLE muta
+ * Comprobar el lanta muchas veces el tabu
+ * CREO QUE NO SE METE EL MEJOR<---------------------
  *
  */
 public class Genetico {
@@ -27,127 +27,90 @@ public class Genetico {
     int nGeneracion;
     int anteriorMejor;
 
-    public void AGGfusion(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[],int optimo) {
+    public void AGGHux(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[], int optimo) {
         poblacion = new ArrayList<>();
-        costes = new int[tamPoblacion];
         descendencia = new ArrayList<>();
-        Random rand = new Random();
-        nGeneracion = 0;
-        anteriorMejor = 999999999;
-        generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
-        int z;
-        descendencia.clear();
+        costes = new int[tamPoblacion];
         costesAux = new int[tamPoblacion];
+        boolean modificado[] = new boolean[tamPoblacion];
+        Random rand = new Random();
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
-        for (z=0; z < 20000; z++) {
-            //System.out.println("-------- VUELTA " + z + " --------");
-            descendencia = new ArrayList<>();
-            costesAux = new int[tamPoblacion];
-            ++nGeneracion;
-            for (int i = 0; i < 50; i++) {
-                tabu = -1;
-                int padre1 = torneoBinario(y, poblacion, matriz);
-                int padre2 = torneoBinario(y, poblacion, matriz);
-                if (rand.nextDouble() < 0.70) {
-                    //AQUI CRUZO
-                    cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
-                    //AQUI MUTO
-                    if (i == muta) {
-                        mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
-                    }
-                    //AQUI ARREGLO LA SOLUCION
-                    arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
-                    //AQUI ELIMINO LAS REDUNDANCIAS
-                    eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
-                    //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
-                    costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
-                    esSolucionPrint(x, y, matriz, descendencia.get(i));
-                    ++z;
-                } else if (i == muta) {
-                    seleccionaPadre(i, padre1, padre2);
-                    mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
-                    arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
-                    eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
-                    costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
-                    esSolucionPrint(x, y, matriz, descendencia.get(i));
-                    ++z;
+        int h1[], h2[];
+        generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
+        for (int i = 1; i < tamPoblacion; i++) {
+            modificado[i] = false;
+        }
+
+        //GENERO 50 PIMPOLLOS INUTINES
+        for (int i = 0; i < tamPoblacion / 2; i++) {
+            tabu = -1;
+            int padre1 = torneoBinario(y, poblacion, matriz);
+            int padre2 = torneoBinario(y, poblacion, matriz);
+            if (rand.nextDouble() < 0.70) {
+                h1 = new int[y];
+                h2 = new int[y];
+                hux(poblacion.get(padre1), poblacion.get(padre2), h1, h2, y);
+                modificado[(i * 2)] = true;
+                modificado[(i * 2) + 1] = true;
+                descendencia.add(h1);
+                descendencia.add(h2);
+            } else {
+                modificado[(i * 2)] = false;
+                modificado[(i * 2) + 1] = false;
+                descendencia.add(poblacion.get(padre1));
+                descendencia.add(poblacion.get(padre2));
+            }
+
+        }
+        System.out.println("Se han almacenado " + descendencia.size() + " pimpollos.");
+        //MUTO
+        mutacionAGG(muta, y);
+        modificado[muta] = true;
+        System.out.println("Se ha mutado el pimpollo " + muta);
+        for (int i = 0; i < tamPoblacion; i++) {
+            if (modificado[i]) {
+                arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+            }
+            eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
+            costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
+            esSolucionPrint(x, y, matriz, descendencia.get(i));
+        }
+
+        //AQUI BUSCO EL MEJOR DE LA POBLACION
+        int mejorP = 0;
+        for (int i = 1; i < tamPoblacion; i++) {
+            if (costes[mejorP] > costes[i]) {
+                mejorP = i;
+            }
+        }
+        //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
+        int peorD = 0;
+        for (int i = 1; i > tamPoblacion; i++) {
+            if (costesAux[peorD] > costesAux[i]) {
+                peorD = i;
+            }
+        }
+        System.out.println("El mejor de la poblacion es: "+costes[mejorP]);
+        System.out.println("El peor de los descendientes es: "+costesAux[peorD]);
+    }
+
+    public void hux(int padre[], int madre[], int hijo1[], int hijo2[], int tam) {
+        Random rand = new Random();
+        for (int i = 1; i < tam; ++i) {
+            if (padre[i] != madre[i]) {
+                if (rand.nextDouble() < 0.5) {
+                    hijo1[i] = padre[i];
+                    hijo2[i] = madre[i];
                 } else {
-                    seleccionaPadre(i, padre1, padre2);
-                    esSolucionPrint(x, y, matriz, descendencia.get(i));
+                    hijo1[i] = madre[i];
+                    hijo2[i] = padre[i];
                 }
-            }
-
-            //AQUI BUSCO EL MEJOR DE LA POBLACION
-            int mejorP = 1;
-            for (int i = 2; i < tamPoblacion; i++) {
-                if (costes[mejorP] > costes[i]) {
-                    mejorP = i;
-                }
-            }
-
-            //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
-            int peorD = 1;
-            for (int i = 2; i > tamPoblacion; i++) {
-                if (costesAux[peorD] > costesAux[i]) {
-                    peorD = i;
-                }
-            }
-
-            //AQUI INTERCAMBIO LAS POBLACIONES
-            //System.out.println("Poblacion tiene tam "+poblacion.size());
-            //System.out.println("Descendencia tiene tam "+descendencia.size());
-            poblacion.clear();
-            for (int i = 0; i < descendencia.size(); ++i) {
-                poblacion.add(descendencia.get(i).clone());
-            }
-            System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
-
-            int mejorD = costesAux[0];
-            for (int i = 1; i < tamPoblacion; ++i) {
-                if (costesAux[i] < mejorD) {
-                    mejorD = costesAux[i];
-                }
-            }
-            if (mejorD > anteriorMejor) {
-                System.out.println("Se ha encontrado un resultado mejor");
-                nGeneracion = 0;
-                anteriorMejor=mejorD;
-            }
-            if (reinicializarEstanc() || reinicializarConv()) {
-                //System.out.println("-------- VOY A REINICIAR --------");
-                int mejor[] = poblacion.get(mejorP).clone();
-                int aux = costes[mejorP];
-                poblacion.clear();
-                costes = new int[tamPoblacion];
-                generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
-                poblacion.add(mejor);
-                costes[tamPoblacion - 1] = aux;
-                nGeneracion = 0;
-            } else//AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
-             if (costes[mejorP] > costesAux[peorD]) {
-                    int peor[] = descendencia.get(peorD);
-                    int mejor[] = poblacion.get(mejorP);
-                    System.arraycopy(mejor, 0, peor, 0, y);
-                    costesAux[peorD] = costes[mejorP];
-                }
-        }
-
-        //PARA SABER QUIEN ES EL MEJOR
-        int mejor = costes[0];
-        for (int i = 1; i < tamPoblacion; ++i) {
-            if (costes[i] < mejor) {
-                mejor = costes[i];
+            } else {
+                hijo1[i] = hijo2[i] = padre[i];
             }
         }
-        System.out.println("FIN DEL ALGORITMO, EL MEJOR COSTE ES DE: " + mejor+" EL OPTIMO ERA: "+optimo+" SE HAN HECHO "+z+" ITERACCIONES");
     }
 
-    public void AGGHux(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[],int optimo) {
-
-    }
-
-    
-    
     public boolean reinicializarEstanc() {
         if (nGeneracion >= 20) {
             //System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO------------------------------------");   //MAAAAAAAAAAL
@@ -459,7 +422,7 @@ public class Genetico {
                 }
             }
             if (!ok) {
-                //System.out.println("-----------------------> NO ES SOLUCION <-------------------");
+                System.out.println("-----------------------> NO ES SOLUCION <-------------------");
                 return false;
             }
         }
@@ -475,5 +438,120 @@ public class Genetico {
             }
         }
         return coste;
+    }
+
+    public void AGGfusion(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[], int optimo) {
+        poblacion = new ArrayList<>();
+        costes = new int[tamPoblacion];
+        descendencia = new ArrayList<>();
+        Random rand = new Random();
+        nGeneracion = 0;
+        anteriorMejor = 999999999;
+        generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
+        int z;
+        descendencia.clear();
+        costesAux = new int[tamPoblacion];
+        int muta = (Math.abs(rand.nextInt() % tamPoblacion));
+        for (z = 0; z < 20000; z++) {
+            //System.out.println("-------- VUELTA " + z + " --------");
+            descendencia = new ArrayList<>();
+            costesAux = new int[tamPoblacion];
+            ++nGeneracion;
+            for (int i = 0; i < 50; i++) {
+                tabu = -1;
+                int padre1 = torneoBinario(y, poblacion, matriz);
+                int padre2 = torneoBinario(y, poblacion, matriz);
+                if (rand.nextDouble() < 0.70) {
+                    //AQUI CRUZO
+                    cruceF(i, padre1, padre2, x, y, matriz, cubreOrdenado);
+                    //AQUI MUTO
+                    if (i == muta) {
+                        mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
+                    }
+                    //AQUI ARREGLO LA SOLUCION
+                    arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+                    //AQUI ELIMINO LAS REDUNDANCIAS
+                    eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
+                    //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
+                    costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
+                    esSolucionPrint(x, y, matriz, descendencia.get(i));
+                    ++z;
+                } else if (i == muta) {
+                    seleccionaPadre(i, padre1, padre2);
+                    mutacionAGG(i, y); //COMPROBAR SI REALMENTE SE MODIFICA
+                    arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+                    eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
+                    costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
+                    esSolucionPrint(x, y, matriz, descendencia.get(i));
+                    ++z;
+                } else {
+                    seleccionaPadre(i, padre1, padre2);
+                    esSolucionPrint(x, y, matriz, descendencia.get(i));
+                }
+            }
+
+            //AQUI BUSCO EL MEJOR DE LA POBLACION
+            int mejorP = 0;
+            for (int i = 1; i < tamPoblacion; i++) {
+                if (costes[mejorP] > costes[i]) {
+                    mejorP = i;
+                }
+            }
+
+            //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
+            int peorD = 0;
+            for (int i = 1; i > tamPoblacion; i++) {
+                if (costesAux[peorD] > costesAux[i]) {
+                    peorD = i;
+                }
+            }
+
+            //AQUI INTERCAMBIO LAS POBLACIONES
+            poblacion.clear();
+            for (int i = 0; i < descendencia.size(); ++i) {
+                poblacion.add(descendencia.get(i).clone());
+            }
+            System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
+
+            int mejorD = costesAux[0];
+            for (int i = 1; i < tamPoblacion; ++i) {
+                if (costesAux[i] < mejorD) {
+                    mejorD = costesAux[i];
+                }
+            }
+            if (mejorD > anteriorMejor) {
+                System.out.println("Se ha encontrado un resultado mejor");
+                nGeneracion = 0;
+                anteriorMejor = mejorD;
+            }
+            if (reinicializarEstanc() || reinicializarConv()) {
+                //System.out.println("-------- VOY A REINICIAR --------");
+                int mejor[] = poblacion.get(mejorP).clone();
+                int aux = costes[mejorP];
+                poblacion.clear();
+                costes = new int[tamPoblacion];
+                generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
+                poblacion.add(mejor);
+                costes[tamPoblacion - 1] = aux;
+                nGeneracion = 0;
+            } else//AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
+            {
+                if (costes[mejorP] > costesAux[peorD]) {
+                    int peor[] = descendencia.get(peorD);
+                    int mejor[] = poblacion.get(mejorP);
+                    System.arraycopy(mejor, 0, peor, 0, y);
+                    costesAux[peorD] = costes[mejorP];
+                }
+            }
+        }
+
+        //PARA SABER QUIEN ES EL MEJOR
+        int mejor = costes[0];
+        for (int i = 1; i < tamPoblacion; ++i) {
+            if (costes[i] < mejor) {
+                mejor = costes[i];
+            }
+        }
+        System.out.println("FIN DEL ALGORITMO, EL MEJOR COSTE ES DE: " + mejor + " EL OPTIMO ERA: " + optimo + " SE HAN HECHO " + z + " ITERACCIONES");
     }
 }
