@@ -94,9 +94,6 @@ public class Pr2Metah {
         }
     }
 
-
-
-
     public static void mostrarMatriz() {
         for (int i = 1; i < x; i++) {
             for (int j = 1; j < y; j++) {
@@ -105,7 +102,6 @@ public class Pr2Metah {
             System.out.println();
         }
     }
-
 
     public static void inicializo() {
         cubreOrdenado = new Pair[y - 1];
@@ -123,15 +119,17 @@ public class Pr2Metah {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws FicheroNoEncontrado, InterruptedException, IOException {
+        //                       5             429          60            14           253
         String ficheros[] = {"scpe1.txt", "scp41.txt", "scpd1.txt", "scpnrf1.txt", "scpa1.txt"};
+        int optimos[] = {5, 429, 60, 14, 253};
         int n = 5;
         Genetico gen;
-        leerFichero(ficheros[1]);
-        inicializo();
-        gen=new Genetico();
-        //gen.mainGenetico(x, y, matriz, cubre, cubreOrdenado);
-        gen.prueba(x, y, matriz, cubre, cubreOrdenado);
-
+        for (int i = 0; i < n; i++) {
+            leerFichero(ficheros[i]);
+            inicializo();
+            gen = new Genetico();
+            gen.AGGfusion(x, y, matriz, cubre, cubreOrdenado, optimos[i]);
+        }
     }
 
 }
