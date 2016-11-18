@@ -13,8 +13,7 @@ import java.util.Random;
  * @author Xenahort
  *
  *
- * Comprobar el lanta muchas veces el tabu
- * CREO QUE NO SE METE EL MEJOR<---------------------
+ * CREO QUE NO HACE LA REINICIALIZACION POR ESTANCAMIENTO
  *
  */
 public class Genetico {
@@ -36,62 +35,122 @@ public class Genetico {
         Random rand = new Random();
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
         int h1[], h2[];
+        anteriorMejor = 9999999;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
         for (int i = 1; i < tamPoblacion; i++) {
             modificado[i] = false;
         }
 
         //GENERO 50 PIMPOLLOS INUTINES
-        for (int i = 0; i < tamPoblacion / 2; i++) {
-            tabu = -1;
-            int padre1 = torneoBinario(y, poblacion, matriz);
-            int padre2 = torneoBinario(y, poblacion, matriz);
-            if (rand.nextDouble() < 0.70) {
-                h1 = new int[y];
-                h2 = new int[y];
-                hux(poblacion.get(padre1), poblacion.get(padre2), h1, h2, y);
-                modificado[(i * 2)] = true;
-                modificado[(i * 2) + 1] = true;
-                descendencia.add(h1);
-                descendencia.add(h2);
+        int z = 0;
+        while (z < 20000) {
+            //System.out.println("-------- VUELTA " + z + " --------");
+            descendencia = new ArrayList<>();
+            costesAux = new int[tamPoblacion];
+            for (int i = 0; i < tamPoblacion / 2; i++) {
+                tabu = -1;
+                int padre1 = torneoBinario(y, poblacion, matriz);
+                int padre2 = torneoBinario(y, poblacion, matriz);
+                if (rand.nextDouble() < 0.70) {
+                    h1 = new int[y];
+                    h2 = new int[y];
+                    hux(poblacion.get(padre1), poblacion.get(padre2), h1, h2, y);
+                    modificado[(i * 2)] = true;
+                    modificado[(i * 2) + 1] = true;
+                    descendencia.add(h1);
+                    descendencia.add(h2);
+                } else {
+                    modificado[(i * 2)] = false;
+                    modificado[(i * 2) + 1] = false;
+                    descendencia.add(poblacion.get(padre1));
+                    descendencia.add(poblacion.get(padre2));
+                }
+
+            }
+            //System.out.println("Se han almacenado " + descendencia.size() + " pimpollos.");
+            //MUTO
+            mutacionAGG(muta, y);
+            modificado[muta] = true;
+            //System.out.println("Se ha mutado el pimpollo " + muta);
+            for (int i = 0; i < tamPoblacion; i++) {
+                if (modificado[i]) {
+                    arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+                    ++z;
+                }
+                eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
+                costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
+                esSolucionPrint(x, y, matriz, descendencia.get(i));
+            }
+
+            //AQUI BUSCO EL MEJOR DE LA POBLACION
+            int mejorP = 0;
+            for (int i = 1; i < tamPoblacion; i++) {
+                if (costes[mejorP] > costes[i]) {
+                    mejorP = i;
+                }
+            }
+            //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
+            int peorD = 0;
+            for (int i = 1; i > tamPoblacion; i++) {
+                if (costesAux[peorD] > costesAux[i]) {
+                    peorD = i;
+                }
+            }
+            //System.out.println("El mejor de la poblacion es: " + costes[mejorP]);
+            //System.out.println("El peor de los descendientes es: " + costesAux[peorD]);
+
+            //GUARDO EL ELITISMO
+            if (costes[mejorP] < costesAux[peorD]) {
+                //System.out.println("El mejor de la poblacion es MEJOR que el peor de los descendientes");
+                costesAux[peorD] = costes[mejorP];
+                descendencia.set(peorD, poblacion.get(mejorP).clone());
             } else {
-                modificado[(i * 2)] = false;
-                modificado[(i * 2) + 1] = false;
-                descendencia.add(poblacion.get(padre1));
-                descendencia.add(poblacion.get(padre2));
+                //System.out.println("El mejor de la poblacion es PEOR que el peor de los descendientes");
             }
 
-        }
-        System.out.println("Se han almacenado " + descendencia.size() + " pimpollos.");
-        //MUTO
-        mutacionAGG(muta, y);
-        modificado[muta] = true;
-        System.out.println("Se ha mutado el pimpollo " + muta);
-        for (int i = 0; i < tamPoblacion; i++) {
-            if (modificado[i]) {
-                arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+            //AQUI INTERCAMBIO LAS POBLACIONES
+            poblacion.clear();
+            for (int i = 0; i < descendencia.size(); ++i) {
+                poblacion.add(descendencia.get(i).clone());
             }
-            eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
-            costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
-            esSolucionPrint(x, y, matriz, descendencia.get(i));
+            System.arraycopy(costesAux, 0, costes, 0, tamPoblacion);
+
+            /*
+        //BUSCO EL MEJOR DE LOS DESCENDIENTES A VER SI HE ENCONTRADO UNO MEJOR 
+        int mejorD = costesAux[0];
+        for (int i = 1; i < tamPoblacion; ++i) {
+            if (costesAux[i] < mejorD) {
+                mejorD = costesAux[i];
+            }
+        }
+        //SI SE ENCUENTRA UN RESULTADO MEJOR A LOS ANTERIORES
+        if (mejorD > anteriorMejor) {
+            System.out.println("Se ha encontrado un resultado mejor");
+            nGeneracion = 0;
+            anteriorMejor = mejorD;
+        }*/
+            if (reinicializarConv()) {
+                //System.out.println("-------- VOY A REINICIAR --------");
+                int mejor[] = poblacion.get(mejorP).clone();
+                int aux = costes[mejorP];
+                poblacion.clear();
+                costes = new int[tamPoblacion];
+                generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
+                poblacion.add(mejor);
+                costes[tamPoblacion - 1] = aux;
+                nGeneracion = 0;
+            }
         }
 
-        //AQUI BUSCO EL MEJOR DE LA POBLACION
-        int mejorP = 0;
-        for (int i = 1; i < tamPoblacion; i++) {
-            if (costes[mejorP] > costes[i]) {
-                mejorP = i;
+        //PARA SABER QUIEN ES EL MEJOR
+        int mejor = costes[0];
+        for (int i = 1; i < tamPoblacion; ++i) {
+            if (costes[i] < mejor) {
+                mejor = costes[i];
             }
         }
-        //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
-        int peorD = 0;
-        for (int i = 1; i > tamPoblacion; i++) {
-            if (costesAux[peorD] > costesAux[i]) {
-                peorD = i;
-            }
-        }
-        System.out.println("El mejor de la poblacion es: "+costes[mejorP]);
-        System.out.println("El peor de los descendientes es: "+costesAux[peorD]);
+        System.out.println("FIN DEL ALGORITMO, EL MEJOR COSTE ES DE: " + mejor + " EL OPTIMO ERA: " + optimo + " SE HAN HECHO " + z + " ITERACCIONES");
+
     }
 
     public void hux(int padre[], int madre[], int hijo1[], int hijo2[], int tam) {
@@ -113,7 +172,7 @@ public class Genetico {
 
     public boolean reinicializarEstanc() {
         if (nGeneracion >= 20) {
-            //System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO------------------------------------");   //MAAAAAAAAAAL
+            System.out.println("HAY QUE REINICIALIZAR POR ESTANCAMIENTO------------------------------------");   //MAAAAAAAAAAL
             return true;
         }
         //System.out.println("NO HAY QUE REINICIALIZAR POR ESTANCAMIENTO");
@@ -448,11 +507,11 @@ public class Genetico {
         nGeneracion = 0;
         anteriorMejor = 999999999;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
-        int z;
+        int z = 0;
         descendencia.clear();
         costesAux = new int[tamPoblacion];
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
-        for (z = 0; z < 20000; z++) {
+        while (z < 20000) {
             //System.out.println("-------- VUELTA " + z + " --------");
             descendencia = new ArrayList<>();
             costesAux = new int[tamPoblacion];
@@ -505,6 +564,12 @@ public class Genetico {
                     peorD = i;
                 }
             }
+            //GUARDO EL ELITISMO
+            if (costes[mejorP] < costesAux[peorD]) {
+                //System.out.println("Guardo el elitismo");
+                costesAux[peorD] = costes[mejorP];
+                descendencia.set(peorD, poblacion.get(mejorP).clone());
+            }
 
             //AQUI INTERCAMBIO LAS POBLACIONES
             poblacion.clear();
@@ -524,6 +589,7 @@ public class Genetico {
                 nGeneracion = 0;
                 anteriorMejor = mejorD;
             }
+
             if (reinicializarEstanc() || reinicializarConv()) {
                 //System.out.println("-------- VOY A REINICIAR --------");
                 int mejor[] = poblacion.get(mejorP).clone();
@@ -534,14 +600,6 @@ public class Genetico {
                 poblacion.add(mejor);
                 costes[tamPoblacion - 1] = aux;
                 nGeneracion = 0;
-            } else//AQUI GUARDO EL ELITISMO   ¿HACE BIEN ESTO? HAY QUE COMPROBARLO
-            {
-                if (costes[mejorP] > costesAux[peorD]) {
-                    int peor[] = descendencia.get(peorD);
-                    int mejor[] = poblacion.get(mejorP);
-                    System.arraycopy(mejor, 0, peor, 0, y);
-                    costesAux[peorD] = costes[mejorP];
-                }
             }
         }
 

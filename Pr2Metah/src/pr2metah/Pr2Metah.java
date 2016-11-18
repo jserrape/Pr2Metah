@@ -124,18 +124,20 @@ public class Pr2Metah {
         int optimos[] = {5, 429, 60, 14, 253};
         int n = 5;
         Genetico gen;
-        /*
+
         for (int i = 0; i < n; i++) {
             leerFichero(ficheros[i]);
             inicializo();
             gen = new Genetico();
-            gen.AGGfusion(x, y, matriz, cubre, cubreOrdenado, optimos[i]);
-        }*/
+            //gen.AGGfusion(x, y, matriz, cubre, cubreOrdenado, optimos[i]);
+            gen.AGGHux(x, y, matriz, cubre, cubreOrdenado, optimos[i]);
+        }
+        /*
         leerFichero(ficheros[3]);
         inicializo();
         gen = new Genetico();
         gen.AGGHux(x, y, matriz, cubre, cubreOrdenado, optimos[3]);
-
+         */
     }
 
 }
