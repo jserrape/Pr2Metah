@@ -129,8 +129,9 @@ public class Pr2Metah {
             leerFichero(ficheros[i]);
             inicializo();
             gen = new Genetico();
-            gen.AGGfusion(  x, y, matriz, cubre, cubreOrdenado, optimos[i],algoritmo[0]);
-            gen.AGGHux(     x, y, matriz, cubre, cubreOrdenado, optimos[i],algoritmo[1]);
+            gen.AGE(x, y, matriz, cubre, cubreOrdenado, i);
+            //gen.AGGfusion(  x, y, matriz, cubre, cubreOrdenado, optimos[i],algoritmo[0]);
+            //gen.AGGHux(     x, y, matriz, cubre, cubreOrdenado, optimos[i],algoritmo[1]);
         }
     }
 

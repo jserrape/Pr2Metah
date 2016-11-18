@@ -6,6 +6,7 @@
 package pr2metah;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -153,6 +154,81 @@ public class Genetico {
         System.out.println("FIN DEL ALGORITMO, EL MEJOR COSTE ES DE: " + mejor + " EL OPTIMO ERA: " + optimo + " SE HAN HECHO " + z + " ITERACCIONES");
 
     }
+    
+    public void AGE(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[], int optimo) {
+        poblacion = new ArrayList<>();
+        descendencia = new ArrayList<>();
+        costes = new int[tamPoblacion];
+        costesAux = new int[2];
+        Random rand = new Random();
+        int h1[], h2[];
+        generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
+
+        int z = 0;
+        while (z < 20000) {
+            //GENERO los dos hijos
+            QuickSort quicksort = new QuickSort();
+            quicksort.sort(costes, poblacion);
+            descendencia.clear();
+            int padre1 = torneoBinario(y, poblacion, matriz);
+            int padre2 = torneoBinario(y, poblacion, matriz);
+            h1 = new int[y];
+            h2 = new int[y];
+            hux(poblacion.get(padre1), poblacion.get(padre2), h1, h2, y);
+            descendencia.add(h1);
+            descendencia.add(h2);
+ 
+            for (int i = 0; i < 2; ++i) {
+                if (((float) (Math.abs(rand.nextInt() % 101)) / 100) < 0.02) {
+                    mutacionAGG(i,y);
+                }
+                arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
+                eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
+                costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);  
+                ++z;
+            }
+            
+            if (costesAux[0] < costesAux[1]) {
+                int temp = costesAux[0];
+                int atemp[] = descendencia.get(0);
+                costesAux[0] = costesAux[1];
+                descendencia.set(0, descendencia.get(1));
+                costesAux[1] = temp;
+                descendencia.set(1, atemp);      
+            }
+            //AQUI BUSCO EL MEJOR DE LA POBLACION
+            if (costesAux[0] < costes[0]) {
+                costes[0] = costesAux[0];
+                poblacion.set(0, descendencia.get(0).clone());
+            }
+            if (costesAux[1] < costes[1]) {
+                costes[1] = costesAux[1];
+                poblacion.set(1, descendencia.get(1).clone());
+            }
+            
+            if (z % 1000 == 0) {
+                probGen -= 0.01;
+            }          
+            if (reinicializarConvAGE()) {
+                //System.out.println("-------- VOY A REINICIAR --------");
+                System.out.println("ILLO QUE HAY QUE RENINICIALIZAR");
+                int mejor[] = poblacion.get(tamPoblacion - 1).clone();
+                int aux = costes[tamPoblacion - 1];
+                poblacion.clear();
+                costes = new int[tamPoblacion];
+                generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
+                poblacion.add(mejor);
+                costes[tamPoblacion - 1] = aux;
+            }
+        }
+        int mejor = costes[0];
+        for (int i = 1; i < tamPoblacion; ++i) {
+            if (costes[i] < mejor) {
+                mejor = costes[i];
+            }
+        }
+        System.out.println("AGE: " + mejor + " --------- ");
+    }
 
     public void hux(int padre[], int madre[], int hijo1[], int hijo2[], int tam) {
         Random rand = new Random();
@@ -211,6 +287,23 @@ public class Genetico {
             }
         }
         //System.out.println("NO HAY QUE REINICIALIZAR POR CONVERGENCIA");
+        return false;
+    }
+    
+    public boolean reinicializarConvAGE() {
+        int cap = (int)(0.8 * tamPoblacion);
+        int cont;
+        for (int i = 0; i < tamPoblacion; ++i) {
+            cont = 0;
+            for (int j = 0; j < tamPoblacion - 1; ++j) {
+                if(Arrays.equals(poblacion.get(j), poblacion.get(j + 1))) {
+                    ++cont;
+                }
+            }
+            if (cont >= cap) {
+                return true;
+            }
+        }
         return false;
     }
 
