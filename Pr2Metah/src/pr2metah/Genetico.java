@@ -28,6 +28,8 @@ public class Genetico {
     int anteriorMejor;
 
     public void AGGHux(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[], String optimo, String alg) {
+        long time_start, time_end;
+        time_start = System.currentTimeMillis();
         poblacion = new ArrayList<>();
         descendencia = new ArrayList<>();
         costes = new int[tamPoblacion];
@@ -142,7 +144,7 @@ public class Genetico {
                 //nGeneracion = 0;
             }
         }
-
+        time_end = System.currentTimeMillis();
         //PARA SABER QUIEN ES EL MEJOR
         int mejor = costes[0];
         for (int i = 1; i < tamPoblacion; ++i) {
@@ -152,10 +154,12 @@ public class Genetico {
         }
         System.out.println("ALGORITMO: : " + alg);
         System.out.println("FIN DEL ALGORITMO, EL MEJOR COSTE ES DE: " + mejor + " EL OPTIMO ERA: " + optimo + " SE HAN HECHO " + z + " ITERACCIONES");
-
+        System.out.println("HA TARDADO " + (float) (time_end - time_start) / 1000.0 + " SEGUNDOS");
     }
-    
-    public void AGE(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[], int optimo) {
+
+    public void AGE(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[], String optimo, String alg) {
+        long time_start, time_end;
+        time_start = System.currentTimeMillis();
         poblacion = new ArrayList<>();
         descendencia = new ArrayList<>();
         costes = new int[tamPoblacion];
@@ -177,24 +181,24 @@ public class Genetico {
             hux(poblacion.get(padre1), poblacion.get(padre2), h1, h2, y);
             descendencia.add(h1);
             descendencia.add(h2);
- 
+
             for (int i = 0; i < 2; ++i) {
                 if (((float) (Math.abs(rand.nextInt() % 101)) / 100) < 0.02) {
-                    mutacionAGG(i,y);
+                    mutacionAGG(i, y);
                 }
                 arreglaSol(x, y, matriz, cubreOrdenado, descendencia.get(i));
                 eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
-                costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);  
+                costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
                 ++z;
             }
-            
+
             if (costesAux[0] < costesAux[1]) {
                 int temp = costesAux[0];
                 int atemp[] = descendencia.get(0);
                 costesAux[0] = costesAux[1];
                 descendencia.set(0, descendencia.get(1));
                 costesAux[1] = temp;
-                descendencia.set(1, atemp);      
+                descendencia.set(1, atemp);
             }
             //AQUI BUSCO EL MEJOR DE LA POBLACION
             if (costesAux[0] < costes[0]) {
@@ -205,13 +209,12 @@ public class Genetico {
                 costes[1] = costesAux[1];
                 poblacion.set(1, descendencia.get(1).clone());
             }
-            
+
             if (z % 1000 == 0) {
                 probGen -= 0.01;
-            }          
+            }
             if (reinicializarConvAGE()) {
                 //System.out.println("-------- VOY A REINICIAR --------");
-                System.out.println("ILLO QUE HAY QUE RENINICIALIZAR");
                 int mejor[] = poblacion.get(tamPoblacion - 1).clone();
                 int aux = costes[tamPoblacion - 1];
                 poblacion.clear();
@@ -221,13 +224,16 @@ public class Genetico {
                 costes[tamPoblacion - 1] = aux;
             }
         }
+        time_end = System.currentTimeMillis();
         int mejor = costes[0];
         for (int i = 1; i < tamPoblacion; ++i) {
             if (costes[i] < mejor) {
                 mejor = costes[i];
             }
         }
-        System.out.println("AGE: " + mejor + " --------- ");
+        System.out.println("ALGORITMO: : " + alg);
+        System.out.println("FIN DEL ALGORITMO, EL MEJOR COSTE ES DE: " + mejor + " EL OPTIMO ERA: " + optimo + " SE HAN HECHO " + z + " ITERACCIONES");
+        System.out.println("HA TARDADO " + (float) (time_end - time_start) / 1000.0 + " SEGUNDOS");
     }
 
     public void hux(int padre[], int madre[], int hijo1[], int hijo2[], int tam) {
@@ -289,14 +295,14 @@ public class Genetico {
         //System.out.println("NO HAY QUE REINICIALIZAR POR CONVERGENCIA");
         return false;
     }
-    
+
     public boolean reinicializarConvAGE() {
-        int cap = (int)(0.8 * tamPoblacion);
+        int cap = (int) (0.8 * tamPoblacion);
         int cont;
         for (int i = 0; i < tamPoblacion; ++i) {
             cont = 0;
             for (int j = 0; j < tamPoblacion - 1; ++j) {
-                if(Arrays.equals(poblacion.get(j), poblacion.get(j + 1))) {
+                if (Arrays.equals(poblacion.get(j), poblacion.get(j + 1))) {
                     ++cont;
                 }
             }
@@ -595,6 +601,8 @@ public class Genetico {
     }
 
     public void AGGfusion(int x, int y, int matriz[][], int cubre[], Pair cubreOrdenado[], String optimo, String alg) {
+        long time_start, time_end;
+        time_start = System.currentTimeMillis();
         poblacion = new ArrayList<>();
         costes = new int[tamPoblacion];
         descendencia = new ArrayList<>();
@@ -698,6 +706,7 @@ public class Genetico {
             }
         }
 
+        time_end = System.currentTimeMillis();
         //PARA SABER QUIEN ES EL MEJOR
         int mejor = costes[0];
         for (int i = 1; i < tamPoblacion; ++i) {
@@ -707,5 +716,6 @@ public class Genetico {
         }
         System.out.println("ALGORITMO: : " + alg);
         System.out.println("FIN DEL ALGORITMO, EL MEJOR COSTE ES DE: " + mejor + " EL OPTIMO ERA: " + optimo + " SE HAN HECHO " + z + " ITERACCIONES");
+        System.out.println("HA TARDADO " + (float) (time_end - time_start) / 1000.0 + " SEGUNDOS");
     }
 }

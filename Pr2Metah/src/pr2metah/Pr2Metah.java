@@ -119,7 +119,7 @@ public class Pr2Metah {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws FicheroNoEncontrado, InterruptedException, IOException {
-        String algoritmo[]={"AGGfusion","AGGhux","AGEhux"};
+        String algoritmo[] = {"AGGfusion", "AGGhux", "AGEhux"};
         String ficheros[] = {"scpe1.txt", "scp41.txt", "scpd1.txt", "scpnrf1.txt", "scpa1.txt"};
         String optimos[] = {"5  ", "429", "60 ", "14 ", "253"};
         int n = 5;
@@ -129,9 +129,12 @@ public class Pr2Metah {
             leerFichero(ficheros[i]);
             inicializo();
             gen = new Genetico();
-            gen.AGE(x, y, matriz, cubre, cubreOrdenado, i);
-            //gen.AGGfusion(  x, y, matriz, cubre, cubreOrdenado, optimos[i],algoritmo[0]);
-            //gen.AGGHux(     x, y, matriz, cubre, cubreOrdenado, optimos[i],algoritmo[1]);
+            gen.AGGfusion(x, y, matriz, cubre, cubreOrdenado, optimos[i], algoritmo[0]);
+            gen = new Genetico();
+            gen.AGGHux(x, y, matriz, cubre, cubreOrdenado, optimos[i], algoritmo[1]);
+            gen = new Genetico();
+            gen.AGE(x, y, matriz, cubre, cubreOrdenado, optimos[i], algoritmo[2]);
+            System.out.println();
         }
     }
 
