@@ -298,8 +298,12 @@ public class Genetico {
 
     public boolean reinicializarConvAGE() {
         int cap = (int) (0.8 * tamPoblacion);
+        int paso = (int) (0.2 * tamPoblacion) + 1;
         int cont;
         for (int i = 0; i < tamPoblacion; ++i) {
+            if (i == paso) {
+                return false;
+            }
             cont = 0;
             for (int j = 0; j < tamPoblacion - 1; ++j) {
                 if (Arrays.equals(poblacion.get(j), poblacion.get(j + 1))) {
