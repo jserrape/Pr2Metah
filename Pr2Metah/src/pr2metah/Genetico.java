@@ -306,7 +306,7 @@ public class Genetico {
             }
             cont = 0;
             for (int j = 0; j < tamPoblacion - 1; ++j) {
-                if (Arrays.equals(poblacion.get(j), poblacion.get(j + 1))) {
+                if (costes[j] == costes[j + 1]) {
                     ++cont;
                 }
             }
