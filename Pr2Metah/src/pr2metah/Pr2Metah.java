@@ -94,15 +94,11 @@ public class Pr2Metah {
         }
     }
 
-    public static void mostrarMatriz() {
-        for (int i = 1; i < x; i++) {
-            for (int j = 1; j < y; j++) {
-                System.out.print(matriz[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
+    /**
+     * Funcion para inicializar el vector de pair cubreOrdenado
+     * que contiene cuantas zonas cubre cada comisaría
+     *
+     */
     public static void inicializo() {
         cubreOrdenado = new Pair[y - 1];
         for (int i = 0; i < y - 1; i++) {
@@ -129,11 +125,11 @@ public class Pr2Metah {
             leerFichero(ficheros[i]);
             inicializo();
             gen = new Genetico();
-            gen.AGGfusion(x, y, matriz, cubre, cubreOrdenado, optimos[i], algoritmo[0]);
+            gen.AGGfusion(x, y, matriz, cubreOrdenado, optimos[i], algoritmo[0]);
             gen = new Genetico();
-            gen.AGGHux(x, y, matriz, cubre, cubreOrdenado, optimos[i], algoritmo[1]);
+            gen.AGGHux(x, y, matriz, cubreOrdenado, optimos[i], algoritmo[1]);
             gen = new Genetico();
-            gen.AGE(x, y, matriz, cubre, cubreOrdenado, optimos[i], algoritmo[2]);
+            gen.AGE(x, y, matriz, cubreOrdenado, optimos[i], algoritmo[2]);
             System.out.println();
         }
     }
