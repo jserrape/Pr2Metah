@@ -73,6 +73,7 @@ public class Genetico {
                     //AQUI CALCULO SU COSTE Y LO METO EN COSTESAUX
                     costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
                     ++z;
+                    
                 } else if (i == muta) {
                     seleccionaPadre(i, padre1, padre2);
                     mutacion(i, y);
@@ -82,6 +83,9 @@ public class Genetico {
                     ++z;
                 } else {
                     seleccionaPadre(i, padre1, padre2);
+                }
+                if (z % 1000 == 0) {
+                        probGen -= 0.01;
                 }
             }
 
@@ -211,6 +215,9 @@ public class Genetico {
                 if (modificado[i]) {
                     reparaSol(x, y, matriz, descendencia.get(i));
                     ++z;
+                    if (z % 1000 == 0) {
+                        probGen -= 0.01;
+                    }
                 }
                 eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
                 costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
@@ -325,8 +332,11 @@ public class Genetico {
                 eliminaRedundancias(y, x, descendencia.get(i), cubreOrdenado, matriz);
                 costesAux[i] = calculaSolucion(y, descendencia.get(i), matriz);
                 ++z;
+                if (z % 1000 == 0) {
+                probGen -= 0.01;
+                }
             }
-
+            
             if (costesAux[0] < costesAux[1]) {
                 int temp = costesAux[0];
                 int atemp[] = descendencia.get(0);
@@ -343,10 +353,6 @@ public class Genetico {
             if (costesAux[1] < costes[1]) {
                 costes[1] = costesAux[1];
                 poblacion.set(1, descendencia.get(1).clone());
-            }
-
-            if (z % 1000 == 0) {
-                probGen -= 0.01;
             }
             if (reinicializarConvAGE()) {
                 //System.out.println("-------- VOY A REINICIAR --------");
