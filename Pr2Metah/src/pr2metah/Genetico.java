@@ -10,10 +10,9 @@ import java.util.Random;
 
 /**
  *
- * @author Xenahort
+ * @author Juanca
  *
  *
- * CREO QUE NO HACE LA REINICIALIZACION POR ESTANCAMIENTO
  *
  */
 public class Genetico {
@@ -55,7 +54,7 @@ public class Genetico {
             descendencia = new ArrayList<>();
             costesAux = new int[tamPoblacion];
             ++nGeneracion;
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < tamPoblacion; i++) {
                 tabu = -1;
                 int padre1 = torneoBinario();
                 int padre2 = torneoBinario();
@@ -99,7 +98,7 @@ public class Genetico {
 
             //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
             int peorD = 0;
-            for (int i = 1; i > tamPoblacion; i++) {
+            for (int i = 1; i < tamPoblacion; i++) {
                 if (costesAux[peorD] > costesAux[i]) {
                     peorD = i;
                 }
@@ -232,7 +231,7 @@ public class Genetico {
             }
             //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
             int peorD = 0;
-            for (int i = 1; i > tamPoblacion; i++) {
+            for (int i = 1; i < tamPoblacion; i++) {
                 if (costesAux[peorD] > costesAux[i]) {
                     peorD = i;
                 }

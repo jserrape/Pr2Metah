@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  *
- * @author alumno
+ * @author Juanca
  */
 public class Pr2Metah {
 
