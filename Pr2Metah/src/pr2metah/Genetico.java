@@ -99,7 +99,7 @@ public class Genetico {
             //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
             int peorD = 0;
             for (int i = 1; i < tamPoblacion; i++) {
-                if (costesAux[peorD] > costesAux[i]) {
+                if (costesAux[peorD] < costesAux[i]) {
                     peorD = i;
                 }
             }
@@ -232,7 +232,7 @@ public class Genetico {
             //AQUI BUSCO EL PEOR DE LOS DESCENDIENTES
             int peorD = 0;
             for (int i = 1; i < tamPoblacion; i++) {
-                if (costesAux[peorD] > costesAux[i]) {
+                if (costesAux[peorD] < costesAux[i]) {
                     peorD = i;
                 }
             }
