@@ -122,8 +122,7 @@ public class Genetico {
                     mejorD = costesAux[i];
                 }
             }
-            if (mejorD > anteriorMejor) {
-                System.out.println("Se ha encontrado un resultado mejor");
+            if (mejorD < anteriorMejor) {
                 nGeneracion = 0;
                 anteriorMejor = mejorD;
             }
@@ -258,8 +257,7 @@ public class Genetico {
                 }
             }
             //SI SE ENCUENTRA UN RESULTADO MEJOR A LOS ANTERIORES
-            if (mejorD > anteriorMejor) {
-                System.out.println("Se ha encontrado un resultado mejor");
+            if (mejorD < anteriorMejor) {
                 nGeneracion = 0;
                 anteriorMejor = mejorD;
             }
