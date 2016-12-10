@@ -46,7 +46,7 @@ public class Genetico {
         nGeneracion = 0;
         anteriorMejor = 999999999;
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
-        int z = 0;
+        int z = tamPoblacion;
         descendencia.clear();
         costesAux = new int[tamPoblacion];
         int muta = (Math.abs(rand.nextInt() % tamPoblacion));
@@ -135,7 +135,7 @@ public class Genetico {
                 generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
                 poblacion.add(mejor);
                 costes[tamPoblacion - 1] = aux;
-                //nGeneracion = 0;
+                z += tamPoblacion - 1;
             }
         }
 
@@ -181,7 +181,7 @@ public class Genetico {
         }
 
         //GENERO 50 PIMPOLLOS INUTINES
-        int z = 0;
+        int z = tamPoblacion;
         while (z < 20000) {
             descendencia = new ArrayList<>();
             costesAux = new int[tamPoblacion];
@@ -269,7 +269,7 @@ public class Genetico {
                 generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
                 poblacion.add(mejor);
                 costes[tamPoblacion - 1] = aux;
-                //nGeneracion = 0;
+                z += tamPoblacion - 1;
             }
         }
         time_end = System.currentTimeMillis();
@@ -307,7 +307,7 @@ public class Genetico {
         int h1[], h2[];
         generarPoblacion(x, y, tamPoblacion, cubreOrdenado, matriz);
 
-        int z = 0;
+        int z = 50;
         while (z < 20000) {
             //GENERO los dos hijos
             QuickSort quicksort = new QuickSort();
@@ -360,6 +360,7 @@ public class Genetico {
                 generarPoblacion(x, y, tamPoblacion - 1, cubreOrdenado, matriz);
                 poblacion.add(mejor);
                 costes[tamPoblacion - 1] = aux;
+                z += tamPoblacion - 1;
             }
         }
         time_end = System.currentTimeMillis();
